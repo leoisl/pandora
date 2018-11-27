@@ -59,7 +59,6 @@ uint32_t KmerNode::get_covg(const bool &strand, const uint32_t &sample_id) {
 }
 
 void KmerNode::set_covg(const uint32_t &value, const bool &strand, const uint32_t &sample_id) {
-    BOOST_LOG_TRIVIAL(debug) << "there are " << this->covg_new.size() << " samples at this node";
     assert(this->covg_new.size() > sample_id);
 
     if (strand)
