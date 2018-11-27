@@ -47,6 +47,8 @@ public:
 
     void check();
 
+    void discover_k();
+
     void set_exp_depth_covg(const uint32_t);
 
     void set_p(const float);

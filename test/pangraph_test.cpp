@@ -203,7 +203,7 @@ TEST(PangenomeGraphTest, add_node_sample) {
     auto l0 = std::make_shared<LocalPRG>(LocalPRG(0, "zero", "AGCTGCTAGCTTCGGACGCACA"));
     std::vector<KmerNodePtr> kmp;
 
-    pg.add_node(0, "zero", "sample", kmp, l0);
+    pg.add_node(0, "zero", "sample", 0, l0, kmp);
 
     EXPECT_EQ(pg.nodes.size(), (uint) 1);
     EXPECT_EQ(pg.nodes[0]->node_id, (uint) 0);
@@ -221,7 +221,7 @@ TEST(PangenomeGraphTest, add_node_sample) {
     EXPECT_EQ(pg.reads.size(), (uint) 0);
 
     // add a second time
-    pg.add_node(0, "zero", "sample", kmp, l0);
+    pg.add_node(0, "zero", "sample", 0, l0, kmp);
     EXPECT_EQ(pg.nodes.size(), (uint) 1);
     EXPECT_EQ(pg.nodes[0]->node_id, (uint) 0);
     EXPECT_EQ(pg.nodes[0]->prg_id, (uint) 0);
@@ -238,7 +238,7 @@ TEST(PangenomeGraphTest, add_node_sample) {
     EXPECT_EQ(pg.reads.size(), (uint) 0);
 
     // add a node with a different sample
-    pg.add_node(0, "zero", "sample1", kmp, l0);
+    pg.add_node(0, "zero", "sample1", 1, l0, kmp);
     EXPECT_EQ(pg.nodes.size(), (uint) 1);
     EXPECT_EQ(pg.nodes[0]->node_id, (uint) 0);
     EXPECT_EQ(pg.nodes[0]->prg_id, (uint) 0);
@@ -258,7 +258,7 @@ TEST(PangenomeGraphTest, add_node_sample) {
     EXPECT_EQ(pg.reads.size(), (uint) 0);
 
     // add a node with a different prg
-    pg.add_node(1, "one", "sample1", kmp, l0);
+    pg.add_node(1, "one", "sample1", 1, l0, kmp);
     EXPECT_EQ(pg.nodes.size(), (uint) 2);
     EXPECT_EQ(pg.nodes[0]->node_id, (uint) 0);
     EXPECT_EQ(pg.nodes[0]->prg_id, (uint) 0);
@@ -302,7 +302,7 @@ TEST(PangenomeGraphTest, clear) {
     // sample pg
     auto l0 = std::make_shared<LocalPRG>(LocalPRG(0, "zero", "AGCTGCTAGCTTCGGACGCACA"));
     std::vector<KmerNodePtr> kmp;
-    pg.add_node(0, "zero", "sample", kmp, l0);
+    pg.add_node(0, "zero", "sample", 0, l0, kmp);
     EXPECT_EQ(pg.reads.size(), (uint) 0);
     EXPECT_EQ(pg.samples.size(), (uint) 1);
     pg.clear();
@@ -616,11 +616,11 @@ TEST(PangenomeGraphTest, save_matrix) {
     auto l0 = std::make_shared<LocalPRG>(LocalPRG(0, "zero", "AGCTGCTAGCTTCGGACGCACA"));
     std::vector<KmerNodePtr> kmp;
 
-    pg.add_node(0, "zero", "sample1", kmp, l0);
-    pg.add_node(0, "zero", "sample1", kmp, l0);
-    pg.add_node(0, "zero", "sample2", kmp, l0);
-    pg.add_node(1, "one", "sample1", kmp, l0);
-    pg.add_node(2, "two", "sample3", kmp, l0);
+    pg.add_node(0, "zero", "sample1", 0, l0, kmp);
+    pg.add_node(0, "zero", "sample1", 0, l0, kmp);
+    pg.add_node(0, "zero", "sample2", 0, l0, kmp);
+    pg.add_node(1, "one", "sample1", 0, l0, kmp);
+    pg.add_node(2, "two", "sample3", 0, l0, kmp);
 
     pg.save_matrix("../../test/test_cases/pangraph_test_save.matrix");
 }
@@ -690,4 +690,74 @@ TEST(PangenomeGraphTest, save_mapped_read_strings) {
     std::ifstream ifs2("zero/zero.reads.fa");
     std::string content2((std::istreambuf_iterator<char>(ifs2)), (std::istreambuf_iterator<char>()));
     EXPECT_TRUE((content2 == expected1) or (content2 == expected2));
+}
+
+TEST(PangenomeGraphTest, get_node_closest_vcf_reference_no_paths) {
+    uint32_t prg_id = 3, w=1, k=3;
+    std::string prg_name = "nested varsite";
+    LocalPRG l3(prg_id, prg_name , "A 5 G 7 C 8 T 7  6 G 5 T");
+    auto index = std::make_shared<Index>();
+    l3.minimizer_sketch(index, w, k);
+    auto prg_ptr = std::make_shared<LocalPRG>(l3);
+
+    Graph pangraph;
+    std::string sample_name = "null_test_sample";
+    std::vector<KmerNodePtr> sample_kmer_path = {};
+
+    pangraph.add_node(prg_id, prg_name, sample_name, 0, prg_ptr, sample_kmer_path);
+    auto path = pangraph.get_node_closest_vcf_reference(*pangraph.nodes[prg_id], w, l3);
+    EXPECT_ITERABLE_EQ(std::vector<LocalNodePtr>, path, l3.prg.top_path());
+}
+
+TEST(PangenomeGraphTest, get_node_closest_vcf_reference_one_path) {
+    uint32_t prg_id = 3, w=1, k=3;
+    std::string prg_name = "nested varsite";
+    LocalPRG l3(prg_id, prg_name , "A 5 G 7 C 8 T 7  6 G 5 T");
+    auto index = std::make_shared<Index>();
+    l3.minimizer_sketch(index, w, k);
+    auto prg_ptr = std::make_shared<LocalPRG>(l3);
+
+    Graph pangraph;
+    std::string sample_name = "single_test_sample";
+
+    auto &kg = l3.kmer_prg;
+    std::vector<KmerNodePtr> sample_kmer_path = {kg.nodes[0], kg.nodes[2], kg.nodes[5], kg.nodes[6]};
+
+    pangraph.add_node(prg_id, prg_name, sample_name, 0, prg_ptr, sample_kmer_path);
+    auto &node = *pangraph.nodes[prg_id];
+
+    auto path = pangraph.get_node_closest_vcf_reference(node, w, l3);
+    std::vector<LocalNodePtr> exp_path = {l3.prg.nodes[0], l3.prg.nodes[1], l3.prg.nodes[3], l3.prg.nodes[4], l3.prg.nodes[6]};
+
+    EXPECT_ITERABLE_EQ(std::vector<LocalNodePtr>, path, exp_path);
+}
+
+TEST(PangenomeGraphTest, get_node_closest_vcf_reference_three_paths) {
+    uint32_t prg_id = 3, w=1, k=3;
+    std::string prg_name = "nested varsite";
+    LocalPRG l3(prg_id, prg_name , "A 5 G 7 C 8 T 7  6 G 5 T");
+    auto index = std::make_shared<Index>();
+    l3.minimizer_sketch(index, w, k);
+    auto prg_ptr = std::make_shared<LocalPRG>(l3);
+
+    Graph pangraph;
+    auto &kg = l3.kmer_prg;
+
+    std::string sample_name = "test_sample1";
+    std::vector<KmerNodePtr> sample_kmer_path = {kg.nodes[0], kg.nodes[2], kg.nodes[5], kg.nodes[6]};
+    pangraph.add_node(prg_id, prg_name, sample_name, 0, prg_ptr, sample_kmer_path);
+
+    sample_name = "test_sample1_again";
+    sample_kmer_path = {kg.nodes[0], kg.nodes[2], kg.nodes[5], kg.nodes[6]};
+    pangraph.add_node(prg_id, prg_name, sample_name, 1, prg_ptr, sample_kmer_path);
+
+    sample_name = "test_sample2";
+    sample_kmer_path = {kg.nodes[0], kg.nodes[4], kg.nodes[6]};
+    pangraph.add_node(prg_id, prg_name, sample_name, 2, prg_ptr, sample_kmer_path);
+
+    auto &node = *pangraph.nodes[prg_id];
+    auto path = pangraph.get_node_closest_vcf_reference(node, w, l3);
+    std::vector<LocalNodePtr> exp_path = {l3.prg.nodes[0], l3.prg.nodes[1], l3.prg.nodes[3], l3.prg.nodes[4], l3.prg.nodes[6]};
+
+    EXPECT_ITERABLE_EQ(std::vector<LocalNodePtr>, path, exp_path);
 }

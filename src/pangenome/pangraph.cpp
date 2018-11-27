@@ -14,7 +14,6 @@
 #include "pangenome/pannode.h"
 #include "pangenome/panread.h"
 #include "pangenome/pansample.h"
-#include "localPRG.h"
 #include "minihit.h"
 #include "fastaq_handler.h"
 
@@ -57,12 +56,9 @@ ReadPtr Graph::get_read(const uint32_t &read_id) {
 }
 
 // Finds or creates a node with id node_id
-// increments the coverage (number of times seen in a read)
-// and records read_id as a read containing this node,
-NodePtr Graph::add_coverage(ReadPtr &read_ptr,
-                            const NodeId &node_id,
-                            const uint32_t &prg_id,
-                            const std::string &prg_name) {
+NodePtr Graph::get_node(const NodeId &node_id,
+                        const uint32_t &prg_id,
+                        const std::string &prg_name){
     NodePtr node_ptr;
     auto it = nodes.find(node_id);
     bool found_node = it != nodes.end();
@@ -74,10 +70,21 @@ NodePtr Graph::add_coverage(ReadPtr &read_ptr,
         node_ptr = it->second;
         node_ptr->covg += 1;
     }
-    node_ptr->reads.insert(read_ptr);
-    assert(node_ptr->covg == node_ptr->reads.size());
     assert(node_id < std::numeric_limits<uint32_t>::max()
            or assert_msg("WARNING, prg_id reached max pangraph node size"));
+    return node_ptr;
+}
+
+// increments the coverage (number of times seen in a read)
+// and records read_id as a read containing this node,
+NodePtr Graph::add_coverage(ReadPtr &read_ptr,
+                            const NodeId &node_id,
+                            const uint32_t &prg_id,
+                            const std::string &prg_name) {
+    NodePtr node_ptr = get_node(node_id, prg_id, prg_name);
+    node_ptr->reads.insert(read_ptr);
+    assert(node_ptr->covg == node_ptr->reads.size());
+
     return node_ptr;
 }
 
@@ -132,42 +139,32 @@ void Graph::add_node(const uint32_t prg_id,
     record_read_info(read_ptr, node_ptr, cluster);
 }
 
-// Add a node corresponding to an instance of a localPRG found in a sample
-void Graph::add_node(const uint32_t prg_id, const std::string &prg_name, const std::string &sample_name,
-                     const std::vector<KmerNodePtr> &kmp, const std::shared_ptr<LocalPRG> &prg) {
-    // add new node if it doesn't exist
-    NodePtr n;
-    auto it = nodes.find(prg_id);
-    if (it == nodes.end()) {
-        //cout << "add node " << *n << endl;
-        n = std::make_shared<Node>(prg_id, prg_id, prg_name);
-        n->kmer_prg = prg->kmer_prg;
-        nodes[prg_id] = n;
-        //nodes[prg_id] = make_shared<Node>(prg_id, prg_id, prg_name);
-        //it = nodes.find(prg_id);
-    } else {
-        n = it->second;
-        n->covg += 1;
-        //cout << "node " << *n << " already existed " << endl;
-    }
-
-    // add a new sample if it doesn't exist
+SamplePtr Graph::get_sample(const std::string &sample_name, const uint32_t &sample_id) {
     SamplePtr s;
     auto sit = samples.find(sample_name);
     if (sit == samples.end()) {
-        //cout << "new sample " << sample_name << endl;
-        s = std::make_shared<Sample>(sample_name);
+        BOOST_LOG_TRIVIAL(debug) << sample_name << " is a new sample in pangraph";
+        s = std::make_shared<Sample>(sample_name, sample_id);
         samples[sample_name] = s;
-        //sit = samples.find(sample_name);
     } else {
+        BOOST_LOG_TRIVIAL(debug) << "found sample " << sample_name;
         s = sit->second;
     }
-    //cout << "sample " << sample_name  << " already existed " << endl;
-    s->add_path(prg_id, kmp);
-    n->samples.insert(s);
+    return s;
+}
 
-    uint32_t sample_id = 0;
-    n->add_path(kmp, sample_id);
+// Add a node corresponding to an instance of a localPRG found in a sample
+void Graph::add_node(const uint32_t prg_id, const std::string &prg_name, const std::string &sample_name,
+                     const uint32_t &sample_id, const std::shared_ptr<LocalPRG> &prg,
+                     const std::vector<KmerNodePtr> &kmp) {
+    // add new node if it doesn't exist
+    NodePtr n = get_node(prg_id, prg_id, prg_name);
+
+    // add a new sample if it doesn't exist
+    SamplePtr s = get_sample(sample_name, sample_id);
+    s->add_path(prg_id, kmp);
+    if (std::find(n->samples.begin(), n->samples.end(), s) == n->samples.end())
+        n->samples.push_back(s);
 }
 
 // Remove the node n, and all references to it
@@ -338,6 +335,8 @@ void Graph::setup_kmergraphs(const std::vector<std::shared_ptr<LocalPRG>> &prgs,
         if (not pangraph_node.kmer_prg.nodes.empty())
             continue;
 
+        std::cout << "setup kmergraphs for node " << pangraph_node.get_name() << std::endl;
+        assert(pangraph_node.prg_id < prgs.size());
         pangraph_node.kmer_prg = prgs[pangraph_node.prg_id]->kmer_prg;
         pangraph_node.kmer_prg.setup_coverages(total_number_samples);
     }
@@ -366,7 +365,8 @@ void Graph::add_hits_to_kmergraphs(const std::vector<std::shared_ptr<LocalPRG>> 
                 auto &kmer_node = *pangraph_node.kmer_prg.nodes[minimizer_hit.knode_id];
                 kmer_node.increment_covg(minimizer_hit.strand, sample_id);
 
-                if (pangraph_node.kmer_prg.nodes[minimizer_hit.knode_id]->get_covg(minimizer_hit.strand, sample_id) == 1000) {
+                if (pangraph_node.kmer_prg.nodes[minimizer_hit.knode_id]->get_covg(minimizer_hit.strand, sample_id) ==
+                    1000) {
                     BOOST_LOG_TRIVIAL(debug) << "Adding hit " << minimizer_hit
                                              << " resulted in high coverage on node "
                                              << *pangraph_node.kmer_prg.nodes[minimizer_hit.knode_id];
@@ -380,6 +380,75 @@ void Graph::add_hits_to_kmergraphs(const std::vector<std::shared_ptr<LocalPRG>> 
                                  << " hits in the reverse";
         pangraph_node.kmer_prg.num_reads = pangraph_node.covg;
     }
+}
+
+// For each node in reference pangraph, copy the coverages over to sample_id in this pangraph
+void Graph::copy_coverages_to_kmergraphs(const Graph &ref_pangraph, const uint32_t &sample_id) {
+    const uint32_t ref_sample_id = 0;
+    for (const auto &ref_node_entry : ref_pangraph.nodes){
+        const Node &ref_node = *ref_node_entry.second;
+        Node &pangraph_node = *nodes[ref_node.node_id];
+
+        for (auto & kmergraph_node_ptr : pangraph_node.kmer_prg.nodes){
+            const auto &knode_id = kmergraph_node_ptr->id;
+            assert(knode_id < ref_node.kmer_prg.nodes.size());
+            kmergraph_node_ptr->set_covg(ref_node.kmer_prg.nodes[knode_id]->get_covg(0, ref_sample_id), 0, sample_id);
+            kmergraph_node_ptr->set_covg(ref_node.kmer_prg.nodes[knode_id]->get_covg(1, ref_sample_id), 1, sample_id);
+        }
+    }
+}
+
+std::vector<std::vector<LocalNodePtr>>
+Graph::infer_vcf_reference_paths(const std::vector<std::shared_ptr<LocalPRG>> &prgs, const uint32_t &w,
+                                 const std::unordered_map<std::string, std::string>& vcf_refs) {
+    std::vector<std::vector<LocalNodePtr>> reference_paths;
+    for (const auto &node_entry: nodes) {
+        const auto &node = *node_entry.second;
+        const auto &prg = *prgs[node.prg_id];
+        const auto &vcf_reference_sequence = vcf_refs.at(prg.name);
+
+        const auto reference_path = prg.get_valid_vcf_reference(vcf_reference_sequence);
+        if (!reference_path.empty())
+            reference_paths.emplace_back(reference_path);
+        else
+            reference_paths.emplace_back(get_node_closest_vcf_reference(node, w, prg));
+    }
+    return reference_paths;
+}
+
+std::vector<LocalNodePtr>
+Graph::get_node_closest_vcf_reference(const Node &node, const uint32_t &w, const LocalPRG &prg) {
+    auto kmer_graph = prg.kmer_prg;
+
+
+    for (const auto &sample_entry: this->samples) {
+        const auto &sample = sample_entry.second;
+        std::cout << *sample << std::endl;
+        if (sample->paths.find(node.prg_id) == sample->paths.end()){
+            BOOST_LOG_TRIVIAL(debug) << "could not find sample path for prg " << node.prg_id;
+            continue;
+        }
+
+        const auto &sample_paths = sample->paths.at(node.prg_id);
+        for (const auto &sample_path : sample_paths) {
+            for (uint32_t i = 0; i != sample_path.size(); ++i) {
+                assert(sample_path[i]->id < kmer_graph.nodes.size()
+                       and kmer_graph.nodes[sample_path[i]->id] != nullptr);
+                kmer_graph.nodes[sample_path[i]->id]->increment_covg(0, 0);
+                kmer_graph.nodes[sample_path[i]->id]->increment_covg(1, 0);
+            }
+        }
+    }
+
+    kmer_graph.discover_k();
+    kmer_graph.set_p(0.01);
+    kmer_graph.num_reads = node.covg;
+
+    std::vector<KmerNodePtr> kmer_path;
+    kmer_graph.find_max_path(kmer_path, 0);
+
+    auto reference_path = prg.localnode_path_from_kmernode_path(kmer_path, w);
+    return reference_path;
 }
 
 same_prg_id::same_prg_id(const NodePtr &p) : q(p->prg_id) {};
@@ -485,9 +554,10 @@ void Graph::save_mapped_read_strings(const std::string &readfilepath, const std:
 
 std::ostream &pangenome::operator<<(std::ostream &out, const pangenome::Graph &m) {
     //cout << "printing pangraph" << endl;
-    /*for (const auto &n : m.nodes) {
-        cout << n.second->prg_id << endl;
-    }*/
+    for (const auto &n : m.nodes) {
+        std::cout << n.second->prg_id << std::endl;
+        std::cout << *n.second << std::endl;
+    }
     for (const auto &n : m.reads) {
         std::cout << *(n.second) << std::endl;
     }

@@ -242,12 +242,22 @@ void KmerGraph::check() {
     }
 }
 
+void KmerGraph::discover_k() {
+    if (nodes.size() > 0) {
+        auto it = nodes.begin();
+        it++;
+        const auto &knode = **it;
+        k = knode.path.length();
+    }
+}
+
 void KmerGraph::set_exp_depth_covg(const uint32_t edp) {
     assert(edp > 0);
     exp_depth_covg = edp;
 }
 
 void KmerGraph::set_p(const float e_rate) {
+    BOOST_LOG_TRIVIAL(debug) << "Set p in kmergraph";
     assert(k != 0);
     assert(0 < e_rate and e_rate < 1);
     p = 1 / exp(e_rate * k);
@@ -315,6 +325,7 @@ float KmerGraph::prob(const uint32_t &j, const uint32_t &num, const uint32_t &sa
 
 float KmerGraph::find_max_path(std::vector<KmerNodePtr> &maxpath, const uint32_t &sample_id) {
     // finds a max likelihood path
+    std::cout << "sample_id" << sample_id << std::endl;
 
     // check if p set
     assert(p < 1 || assert_msg("p was not set in kmergraph"));
@@ -324,16 +335,23 @@ float KmerGraph::find_max_path(std::vector<KmerNodePtr> &maxpath, const uint32_t
     // need to catch if thesh not set too...
 
     check();
+    std::cout << "checked" << std::endl;
 
     // also check not all 0 covgs
-    bool not_all_zero = false;
+    bool all_zero = true;
     for (const auto &n : nodes) {
+        std::cout << n->get_covg(0, sample_id) << " + "  << n->get_covg(1, sample_id) << " = "
+                  << n->get_covg(0, sample_id) + n->get_covg(1, sample_id) << " > 0 is "
+                  << (n->get_covg(0, sample_id) + n->get_covg(1, sample_id) > 0) << std::endl;
+        std::cout << "sanity check 0 > 0 is " << (0 > 0) << std::endl;
         if (n->get_covg(0, sample_id) + n->get_covg(1, sample_id) > 0) {
-            not_all_zero = true;
+            std::cout << "found false" << std::endl;
+            all_zero = false;
             break;
         }
     }
-    if (!not_all_zero) {
+    if (all_zero) {
+        std::cout << "all zero" << std::endl;
         BOOST_LOG_TRIVIAL(debug) << "ALL ZEROES";
     }
 
@@ -802,7 +820,7 @@ bool pCompKmerNode::operator()(KmerNodePtr lhs, KmerNodePtr rhs) {
 
 std::ostream &operator<<(std::ostream &out, KmerGraph const &data) {
     for (const auto &c: data.nodes) {
-        out << *(c);
+        out << *(c) << std::endl;
     }
     return out;
 }
