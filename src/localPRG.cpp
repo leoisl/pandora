@@ -4,7 +4,6 @@
 #include <cmath>
 #include <algorithm>
 #include <numeric>
-#include <sstream>
 
 #include <boost/log/trivial.hpp>
 
@@ -1197,11 +1196,9 @@ uint32_t sum(const std::vector<uint32_t> &v) {
 }
 
 uint32_t mean(const std::vector<uint32_t> &v) {
-    std::stringstream ss;
-    for (const auto &i : v)
-        ss << i << " ";
     std::string s;
-    ss >> s;
+    for (const auto &i : v)
+        s += int_to_string(i) + " ";
     BOOST_LOG_TRIVIAL(debug) << "mean of " << s;
     if (v.empty())
         return 0;
@@ -1209,11 +1206,9 @@ uint32_t mean(const std::vector<uint32_t> &v) {
 }
 
 uint32_t median(std::vector<uint32_t> v) {
-    std::stringstream ss;
-    for (const auto &i : v)
-        ss << i << " ";
     std::string s;
-    ss >> s;
+    for (const auto &i : v)
+        s += int_to_string(i) + " ";
     BOOST_LOG_TRIVIAL(debug) << "median of " << s;
     if (v.empty())
         return 0;
@@ -1230,11 +1225,9 @@ uint32_t median(std::vector<uint32_t> v) {
 
 uint32_t mode(std::vector<uint32_t> v) {
     std::sort(v.begin(), v.end());
-    std::stringstream ss;
-    for (const auto &i : v)
-        ss << i << " ";
     std::string s;
-    ss >> s;
+    for (const auto &i : v)
+        s += int_to_string(i) + " ";
     BOOST_LOG_TRIVIAL(debug) << "mode of " << s;
     uint32_t counter = 1;
     uint32_t max_count = 1;

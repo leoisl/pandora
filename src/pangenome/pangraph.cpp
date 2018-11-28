@@ -387,6 +387,7 @@ void Graph::copy_coverages_to_kmergraphs(const Graph &ref_pangraph, const uint32
     const uint32_t ref_sample_id = 0;
     for (const auto &ref_node_entry : ref_pangraph.nodes){
         const Node &ref_node = *ref_node_entry.second;
+        assert(nodes.find(ref_node.node_id) != nodes.end());
         Node &pangraph_node = *nodes[ref_node.node_id];
 
         for (auto & kmergraph_node_ptr : pangraph_node.kmer_prg.nodes){

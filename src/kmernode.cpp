@@ -60,7 +60,6 @@ uint32_t KmerNode::get_covg(const bool &strand, const uint32_t &sample_id) {
 
 void KmerNode::set_covg(const uint32_t &value, const bool &strand, const uint32_t &sample_id) {
     assert(this->covg_new.size() > sample_id);
-
     if (strand)
         this->covg_new[sample_id].first = value;
     else

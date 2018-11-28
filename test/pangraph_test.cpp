@@ -761,3 +761,58 @@ TEST(PangenomeGraphTest, get_node_closest_vcf_reference_three_paths) {
 
     EXPECT_ITERABLE_EQ(std::vector<LocalNodePtr>, path, exp_path);
 }
+
+TEST(PangenomeGraphTest, copy_coverages_to_kmergraphs){
+    uint32_t prg_id = 3, w=1, k=3;
+    std::string prg_name = "nested varsite", sample_name = "sample";
+    LocalPRG l3(prg_id, prg_name , "A 5 G 7 C 8 T 7  6 G 5 T");
+    auto index = std::make_shared<Index>();
+    l3.minimizer_sketch(index, w, k);
+    auto prg_ptr = std::make_shared<LocalPRG>(l3);
+
+    Graph ref_pangraph;
+    auto sample_id = 0;
+    std::vector<KmerNodePtr> empty = {};
+    ref_pangraph.add_node(prg_id, prg_name, sample_name, sample_id, prg_ptr, empty);
+
+    EXPECT_TRUE(ref_pangraph.nodes.find(prg_id) != ref_pangraph.nodes.end());
+    ref_pangraph.nodes[prg_id]->kmer_prg = l3.kmer_prg;
+    auto &kg = ref_pangraph.nodes[prg_id]->kmer_prg;
+    EXPECT_EQ(kg.nodes.size(), (uint)7);
+    kg.nodes[2]->set_covg(5, 1, sample_id);
+    kg.nodes[4]->set_covg(8, 0, sample_id);
+    kg.nodes[5]->set_covg(2, 1, sample_id);
+    kg.nodes[6]->set_covg(5, 0, sample_id);
+
+    Graph pangraph;
+    sample_id = 3;
+    pangraph.add_node(prg_id, prg_name, sample_name, sample_id, prg_ptr, empty);
+
+    LocalPRG dummy(0,"null","");
+    auto dummy_prg_ptr = std::make_shared<LocalPRG>(dummy);
+    pangraph.setup_kmergraphs({dummy_prg_ptr, dummy_prg_ptr, dummy_prg_ptr, prg_ptr}, 4);
+
+    pangraph.copy_coverages_to_kmergraphs(ref_pangraph, sample_id);
+
+    for (uint32_t id = 0; id < 3; ++id){
+        for (const auto &node : pangraph.nodes[prg_id]->kmer_prg.nodes){
+            EXPECT_EQ(node->get_covg(0,id), (uint)0);
+            EXPECT_EQ(node->get_covg(1,id), (uint)0);
+        }
+    }
+    auto id = sample_id;
+    EXPECT_EQ(pangraph.nodes[prg_id]->kmer_prg.nodes[0]->get_covg(0,id), (uint)0);
+    EXPECT_EQ(pangraph.nodes[prg_id]->kmer_prg.nodes[0]->get_covg(1,id), (uint)0);
+    EXPECT_EQ(pangraph.nodes[prg_id]->kmer_prg.nodes[1]->get_covg(0,id), (uint)0);
+    EXPECT_EQ(pangraph.nodes[prg_id]->kmer_prg.nodes[1]->get_covg(1,id), (uint)0);
+    EXPECT_EQ(pangraph.nodes[prg_id]->kmer_prg.nodes[2]->get_covg(0,id), (uint)0);
+    EXPECT_EQ(pangraph.nodes[prg_id]->kmer_prg.nodes[2]->get_covg(1,id), (uint)5);
+    EXPECT_EQ(pangraph.nodes[prg_id]->kmer_prg.nodes[3]->get_covg(0,id), (uint)0);
+    EXPECT_EQ(pangraph.nodes[prg_id]->kmer_prg.nodes[3]->get_covg(1,id), (uint)0);
+    EXPECT_EQ(pangraph.nodes[prg_id]->kmer_prg.nodes[4]->get_covg(0,id), (uint)8);
+    EXPECT_EQ(pangraph.nodes[prg_id]->kmer_prg.nodes[4]->get_covg(1,id), (uint)0);
+    EXPECT_EQ(pangraph.nodes[prg_id]->kmer_prg.nodes[5]->get_covg(0,id), (uint)0);
+    EXPECT_EQ(pangraph.nodes[prg_id]->kmer_prg.nodes[5]->get_covg(1,id), (uint)2);
+    EXPECT_EQ(pangraph.nodes[prg_id]->kmer_prg.nodes[6]->get_covg(0,id), (uint)5);
+    EXPECT_EQ(pangraph.nodes[prg_id]->kmer_prg.nodes[6]->get_covg(1,id), (uint)0);
+}
