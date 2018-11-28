@@ -4,6 +4,7 @@
 #include <cmath>
 #include <algorithm>
 #include <numeric>
+#include <sstream>
 
 #include <boost/log/trivial.hpp>
 
@@ -932,7 +933,7 @@ LocalPRG::add_sample_gt_to_vcf(VCF &vcf,
                                const std::vector<LocalNodePtr> &rpath,
                                const std::vector<LocalNodePtr> &sample_path,
                                const std::string &sample_name) const {
-    std::cout << now() << "Update VCF with sample path" << std::endl;
+    BOOST_LOG_TRIVIAL(info) << "Update VCF with sample path";
     /*for (uint i=0; i!=sample_path.size(); ++i)
     {
 	std::cout << *sample_path[i] << " ";
@@ -1196,12 +1197,24 @@ uint32_t sum(const std::vector<uint32_t> &v) {
 }
 
 uint32_t mean(const std::vector<uint32_t> &v) {
+    std::stringstream ss;
+    for (const auto &i : v)
+        ss << i << " ";
+    std::string s;
+    ss >> s;
+    BOOST_LOG_TRIVIAL(debug) << "mean of " << s;
     if (v.empty())
         return 0;
     return std::accumulate(v.begin(), v.end(), 0) / v.size();
 }
 
 uint32_t median(std::vector<uint32_t> v) {
+    std::stringstream ss;
+    for (const auto &i : v)
+        ss << i << " ";
+    std::string s;
+    ss >> s;
+    BOOST_LOG_TRIVIAL(debug) << "median of " << s;
     if (v.empty())
         return 0;
     std::sort(v.begin(), v.end());
@@ -1217,6 +1230,12 @@ uint32_t median(std::vector<uint32_t> v) {
 
 uint32_t mode(std::vector<uint32_t> v) {
     std::sort(v.begin(), v.end());
+    std::stringstream ss;
+    for (const auto &i : v)
+        ss << i << " ";
+    std::string s;
+    ss >> s;
+    BOOST_LOG_TRIVIAL(debug) << "mode of " << s;
     uint32_t counter = 1;
     uint32_t max_count = 1;
     uint32_t most_common = 0;
@@ -1240,7 +1259,7 @@ void LocalPRG::add_sample_covgs_to_vcf(VCF &vcf, const KmerGraph &kg,
                                        const std::vector<LocalNodePtr> &ref_path,
                                        const std::string &sample_name,
                                        const uint32_t &sample_id) const {
-    std::cout << now() << "Update VCF with sample covgs" << std::endl;
+    BOOST_LOG_TRIVIAL(info) << "Update VCF with sample covgs";
 
     assert(!prg.nodes.empty()); //otherwise empty nodes -> segfault
     vcf.sort_records();

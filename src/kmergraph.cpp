@@ -347,9 +347,7 @@ float KmerGraph::find_max_path(std::vector<KmerNodePtr> &maxpath, const uint32_t
     assert(num_reads > 0 || assert_msg("num_reads was not set in kmergraph"));
 
     // need to catch if thesh not set too...
-
     check();
-    std::cout << "checked" << std::endl;
 
     // also check not all 0 covgs
     auto coverages_all_zero(sample_id);
