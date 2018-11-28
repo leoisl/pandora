@@ -816,3 +816,71 @@ TEST(PangenomeGraphTest, copy_coverages_to_kmergraphs){
     EXPECT_EQ(pangraph.nodes[prg_id]->kmer_prg.nodes[6]->get_covg(0,id), (uint)5);
     EXPECT_EQ(pangraph.nodes[prg_id]->kmer_prg.nodes[6]->get_covg(1,id), (uint)0);
 }
+
+TEST(PangenomeGraphTest, infer_node_vcf_reference_path_no_file_strings)
+{
+    std::vector<std::shared_ptr<LocalPRG>> prgs;
+    std::vector<std::string> prg_strings;
+    prg_strings.push_back("ATGCCGGTAATTAAAGTACGTGAAAAGAAACTGGCTC 5 A 6 G 5 CGAAAACGCACGCCGCACTCGTCTGTAC");
+    prg_strings.push_back("A 5 G 7 C 8 T 7  6 G 5 T");
+    prg_strings.push_back("TC 5 ACTC 7 TAGTCA 8 TTGTGA 7  6 AACTAG 5 AG");
+    prg_strings.push_back("A 5 G 7 C 8 T 7 T 9 CCG 10 CGG 9  6 G 5 TAT");
+
+    Graph pangraph;
+    std::vector<KmerNodePtr> empty;
+    auto index = std::make_shared<Index>();
+    uint32_t prg_id = 0, sample_id = 0, w = 1, k = 3;
+    std::unordered_map<std::string, std::string> vcf_refs;
+    std::vector<std::vector<LocalNodePtr>> vcf_ref_paths;
+    for (const auto &prg_string : prg_strings){
+        std::string prg_name = "prg" + std::to_string(prg_id), sample_name = "sample";
+        prgs.emplace_back(std::make_shared<LocalPRG>(LocalPRG(prg_id, prg_name, prg_string)));
+        prgs.back()->minimizer_sketch(index, w, k);
+        pangraph.add_node(prg_id, prg_name, sample_name, sample_id, prgs.back(), empty);
+        vcf_ref_paths.emplace_back(pangraph.infer_node_vcf_reference_path(*pangraph.nodes[prg_id], prgs.back(), w, vcf_refs));
+        prg_id++;
+    }
+
+    EXPECT_EQ(vcf_ref_paths.size(), (uint)4);
+    for (uint j=0; j<vcf_ref_paths.size(); ++j)
+        EXPECT_ITERABLE_EQ(std::vector<LocalNodePtr>, vcf_ref_paths[j], prgs[j]->prg.top_path());
+}
+
+TEST(PangenomeGraphTest, infer_node_vcf_reference_path_with_file_strings)
+{
+    std::vector<std::shared_ptr<LocalPRG>> prgs;
+    std::vector<std::string> prg_strings;
+    prg_strings.push_back("ATGCCGGTAATTAAAGTACGTGAAAAGAAACTGGCTC 5 A 6 G 5 CGAAAACGCACGCCGCACTCGTCTGTAC");
+    prg_strings.push_back("A 5 G 7 C 8 T 7  6 G 5 T");
+    prg_strings.push_back("TC 5 ACTC 7 TAGTCA 8 TTGTGA 7  6 AACTAG 5 AG");
+    prg_strings.push_back("AATTTTTTTGGGGTTGGTTTTAAA 5 GGGGG 7 CCCCCC 8 TTTTTT 7 TTTTTT 9 CCGCCGCCGCCG 10 CGGCCGCCG 9  6 GGGGG 5 TATAAAAATTTTTT");
+    std::unordered_map<std::string, std::string> vcf_ref_strings;
+    vcf_ref_strings["prg0"] = "ATGCCGGTAATTAAAGTACGTGAAAAGAAACTGGCTCGCGAAAACGCACGCCGCACTCGTCTGTAC"; // valid
+    vcf_ref_strings["prg1"] = "AGT"; //invalid, too short
+    vcf_ref_strings["prg2"] = "ATGCCGGTAATTAAAGTACGTGAAAAGAAACTGGCTCGCGAAAACGCACGCCGCACTCGTCTGTAC"; //invalid, is not a path through prg
+    vcf_ref_strings["prg3"] = "AATTTTTTTGGGGTTGGTTTTAAAGGGGGTTTTTTTTTTTTCCGCCGCCGCCGTATAAAAATTTTTT"; //valid
+
+    Graph pangraph;
+    std::vector<KmerNodePtr> empty;
+    auto index = std::make_shared<Index>();
+    uint32_t prg_id = 0, sample_id = 0, w = 1, k = 3;
+    std::vector<std::vector<LocalNodePtr>> vcf_ref_paths;
+    for (const auto &prg_string : prg_strings){
+        std::string prg_name = "prg" + std::to_string(prg_id), sample_name = "sample";
+        prgs.emplace_back(std::make_shared<LocalPRG>(LocalPRG(prg_id, prg_name, prg_string)));
+        prgs.back()->minimizer_sketch(index, w, k);
+        pangraph.add_node(prg_id, prg_name, sample_name, sample_id, prgs.back(), empty);
+        vcf_ref_paths.emplace_back(pangraph.infer_node_vcf_reference_path(*pangraph.nodes[prg_id], prgs.back(),
+                                                                          w, vcf_ref_strings));
+        prg_id++;
+    }
+
+    std::vector<LocalNodePtr> exp_path0 = {prgs[0]->prg.nodes[0], prgs[0]->prg.nodes[2], prgs[0]->prg.nodes[3]};
+    EXPECT_ITERABLE_EQ(std::vector<LocalNodePtr>, vcf_ref_paths[0], exp_path0);
+    EXPECT_ITERABLE_EQ(std::vector<LocalNodePtr>, vcf_ref_paths[1], prgs[1]->prg.top_path());
+    EXPECT_ITERABLE_EQ(std::vector<LocalNodePtr>, vcf_ref_paths[2], prgs[2]->prg.top_path());
+    std::vector<LocalNodePtr> exp_path3 = {prgs[3]->prg.nodes[0], prgs[3]->prg.nodes[1], prgs[3]->prg.nodes[3],
+                                           prgs[3]->prg.nodes[4], prgs[3]->prg.nodes[5], prgs[3]->prg.nodes[7],
+                                           prgs[3]->prg.nodes[9]};
+    EXPECT_ITERABLE_EQ(std::vector<LocalNodePtr>, vcf_ref_paths[3], exp_path3);
+}

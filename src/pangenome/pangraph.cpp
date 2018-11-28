@@ -399,25 +399,19 @@ void Graph::copy_coverages_to_kmergraphs(const Graph &ref_pangraph, const uint32
     }
 }
 
-std::vector<std::vector<LocalNodePtr>>
-Graph::infer_vcf_reference_paths(const std::vector<std::shared_ptr<LocalPRG>> &prgs, const uint32_t &w,
-                                 const std::unordered_map<std::string, std::string>& vcf_refs) {
-    BOOST_LOG_TRIVIAL(info) << "Infer VCF reference paths";
-    std::vector<std::vector<LocalNodePtr>> reference_paths;
-    for (const auto &node_entry: nodes) {
-        const auto &node = *node_entry.second;
-        const auto &prg = *prgs[node.prg_id];
-        if (vcf_refs.find(prg.name) != vcf_refs.end()){
-            const auto &vcf_reference_sequence = vcf_refs.at(prg.name);
-            const auto reference_path = prg.get_valid_vcf_reference(vcf_reference_sequence);
-            if (!reference_path.empty()){
-                reference_paths.emplace_back(reference_path);
-                continue;
-            }
-        }
-        reference_paths.emplace_back(get_node_closest_vcf_reference(node, w, prg));
+
+std::vector<LocalNodePtr>
+Graph::infer_node_vcf_reference_path(const Node &node, const std::shared_ptr<LocalPRG> &prg_ptr, const uint32_t &w,
+                                     const std::unordered_map<std::string, std::string> &vcf_refs) {
+    BOOST_LOG_TRIVIAL(info) << "Infer VCF reference path";
+    const auto &prg = *prg_ptr;
+    if (vcf_refs.find(prg.name) != vcf_refs.end()){
+        const auto &vcf_reference_sequence = vcf_refs.at(prg.name);
+        const auto reference_path = prg.get_valid_vcf_reference(vcf_reference_sequence);
+        if (!reference_path.empty())
+            return reference_path;
     }
-    return reference_paths;
+    return get_node_closest_vcf_reference(node, w, prg);
 }
 
 std::vector<LocalNodePtr>

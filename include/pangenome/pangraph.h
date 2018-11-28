@@ -77,9 +77,9 @@ public:
 
     void copy_coverages_to_kmergraphs(const Graph &, const uint32_t &);
 
-    std::vector<std::vector<LocalNodePtr>>
-    infer_vcf_reference_paths(const std::vector<std::shared_ptr<LocalPRG>> &prgs, const uint32_t &w,
-                              const std::unordered_map<std::string, std::string> &VCFRefs);
+    std::vector<LocalNodePtr>
+    infer_node_vcf_reference_path(const Node &, const std::shared_ptr<LocalPRG> &, const uint32_t &,
+                                  const std::unordered_map<std::string, std::string> &);
 
     std::vector<LocalNodePtr>
     get_node_closest_vcf_reference(const Node &, const uint32_t &, const LocalPRG &);

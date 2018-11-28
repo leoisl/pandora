@@ -318,7 +318,6 @@ int pandora_compare(int argc, char *argv[]) {
         vcf_refs.reserve(prgs.size());
         load_vcf_refs_file(vcf_refs_file, vcf_refs);
     }
-    const auto vcf_reference_paths = pangraph->infer_vcf_reference_paths(prgs, w, vcf_refs);
 
     VCF master_vcf;
 
@@ -326,17 +325,18 @@ int pandora_compare(int argc, char *argv[]) {
         BOOST_LOG_TRIVIAL(debug) << "Consider next node";
         const auto &node_id = pangraph_node_entry.first;
         pangenome::Node &pangraph_node = *pangraph_node_entry.second;
+
         const auto &prg_id = pangraph_node.prg_id;
-
         assert(prgs.size() > prg_id);
-        assert(vcf_reference_paths.size() > prg_id);
+        const auto& prg_ptr = prgs[prg_id];
 
-        BOOST_LOG_TRIVIAL(debug) << " c.first: " << node_id << " prgs[c.first]->name: " << prgs[prg_id]->name;
+        const auto vcf_reference_path = pangraph->infer_node_vcf_reference_path(pangraph_node, prg_ptr, w, vcf_refs);
+        BOOST_LOG_TRIVIAL(debug) << " c.first: " << node_id << " prgs[c.first]->name: " << prg_ptr->name;
 
         auto node_outdir = outdir + "/" + pangraph_node.get_name();
         fs::create_directories(node_outdir);
 
-        pangraph_node.construct_multisample_vcf(master_vcf, vcf_reference_paths[prg_id], prgs[prg_id], w);
+        pangraph_node.construct_multisample_vcf(master_vcf, vcf_reference_path, prg_ptr, w);
     }
     master_vcf.save(outdir + "/pandora_multisample_consensus.vcf", true, true, true, true, true, true, true);
 
