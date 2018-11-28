@@ -365,7 +365,7 @@ void VCF::merge_multi_allelic(uint32_t max_allele_length) {
         }
     }
     clean();
-    assert(records.size() < vcf_size);
+    assert(records.size() <= vcf_size);
     sort_records();
 }
 
