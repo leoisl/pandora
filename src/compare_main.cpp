@@ -271,7 +271,7 @@ int pandora_compare(int argc, char *argv[]) {
         pangraph_sample->add_hits_to_kmergraphs(prgs, 0);
 
         BOOST_LOG_TRIVIAL(info) << "Estimate parameters for kmer graph model";
-        estimate_parameters(pangraph_sample, sample_outdir, k, e_rate, covg, bin, sample_id);
+        estimate_parameters(pangraph_sample, sample_outdir, k, e_rate, covg, bin, 0);
 
         BOOST_LOG_TRIVIAL(info) << "Find max likelihood PRG paths";
         auto sample_pangraph_size = pangraph_sample->nodes.size();
@@ -280,8 +280,7 @@ int pandora_compare(int argc, char *argv[]) {
             local_prg.add_consensus_path_to_fastaq(consensus_fq,
                                                    c->second,
                                                    kmp, lmp, w,
-                                                   bin, covg,
-                                                   sample_id);
+                                                   bin, covg, 0);
 
             if (kmp.empty()) {
                 c = pangraph_sample->remove_node(c->second);
