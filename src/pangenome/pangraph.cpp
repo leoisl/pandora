@@ -406,13 +406,15 @@ Graph::infer_vcf_reference_paths(const std::vector<std::shared_ptr<LocalPRG>> &p
     for (const auto &node_entry: nodes) {
         const auto &node = *node_entry.second;
         const auto &prg = *prgs[node.prg_id];
-        const auto &vcf_reference_sequence = vcf_refs.at(prg.name);
-
-        const auto reference_path = prg.get_valid_vcf_reference(vcf_reference_sequence);
-        if (!reference_path.empty())
-            reference_paths.emplace_back(reference_path);
-        else
-            reference_paths.emplace_back(get_node_closest_vcf_reference(node, w, prg));
+        if (vcf_refs.find(prg.name) != vcf_refs.end()){
+            const auto &vcf_reference_sequence = vcf_refs.at(prg.name);
+            const auto reference_path = prg.get_valid_vcf_reference(vcf_reference_sequence);
+            if (!reference_path.empty()){
+                reference_paths.emplace_back(reference_path);
+                continue;
+            }
+        }
+        reference_paths.emplace_back(get_node_closest_vcf_reference(node, w, prg));
     }
     return reference_paths;
 }
