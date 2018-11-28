@@ -295,7 +295,7 @@ void merge_gt(VCFRecord &first, const VCFRecord &second, const uint16_t i, const
 
 
 void VCF::merge_multi_allelic(uint32_t max_allele_length) {
-    if (records.empty())
+    if (records.size() < 2)
         return;
 
     uint32_t prev_pos = 0;
