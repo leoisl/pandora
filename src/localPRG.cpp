@@ -313,7 +313,7 @@ std::vector<Path> LocalPRG::shift(Path p) const {
 }
 
 void LocalPRG::minimizer_sketch(std::shared_ptr<Index> index, const uint32_t w, const uint32_t k) {
-    std::cout << now() << "Sketch PRG " << name << " which has " << prg.nodes.size() << " nodes" << std::endl;
+    BOOST_LOG_TRIVIAL(info) << "Sketch PRG " << name << " which has " << prg.nodes.size() << " nodes";
 
     // clean up after any previous runs
     // although note we can't clear the index because it is also added to by other LocalPRGs
@@ -807,7 +807,7 @@ void LocalPRG::write_aligned_path_to_fasta(const boost::filesystem::path &filepa
 }
 
 void LocalPRG::build_vcf(VCF &vcf, const std::vector<LocalNodePtr> &ref) const {
-    std::cout << now() << "Build VCF for prg " << name << std::endl;
+    BOOST_LOG_TRIVIAL(info) << "Build VCF for prg " << name;
     assert(!prg.nodes.empty()); //otherwise empty nodes -> segfault
 
     std::vector<LocalNodePtr> varpath;

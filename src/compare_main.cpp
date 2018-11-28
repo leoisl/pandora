@@ -349,18 +349,17 @@ int pandora_compare(int argc, char *argv[]) {
     BOOST_LOG_TRIVIAL(info) << "Output matrix";
     pangraph->save_matrix(outdir + "/pandora_multisample.matrix");
 
-    // clear up
-    BOOST_LOG_TRIVIAL(info) << "Clear up";
-    index->clear();
-    minimizer_hits->clear();
-    pangraph->clear();
-    pangraph_sample->clear();
-
     if (pangraph->nodes.empty()) {
         std::cout << "No LocalPRGs found to compare samples on. "
                   << "Is your genome_size accurate? Genome size is assumed to be "
                   << genome_size << " and can be updated with --genome_size" << std::endl;
     }
+
+    // clear up
+    index->clear();
+    minimizer_hits->clear();
+    pangraph->clear();
+    pangraph_sample->clear();
 
     // current date/time based on current system
     std::cout << "FINISH: " << now() << std::endl;

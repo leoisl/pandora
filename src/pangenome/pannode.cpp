@@ -127,19 +127,16 @@ void Node::construct_multisample_vcf(VCF &master_vcf, const std::vector<LocalNod
             if (count == 0) {
                 prg->add_sample_gt_to_vcf(vcf, vcf_reference_path, sample_local_path, sample->name);
                 BOOST_LOG_TRIVIAL(debug) << "With sample added:\n" << vcf;
-                std::cout << vcf << std::endl;
                 prg->add_sample_covgs_to_vcf(vcf, kmer_prg, vcf_reference_path, sample->name, sample->sample_id);
                 BOOST_LOG_TRIVIAL(debug) << "With sample coverages added:\n" << vcf;
             } else {
                 auto path_specific_sample_name = sample->name + std::to_string(count);
                 prg->add_sample_gt_to_vcf(vcf, vcf_reference_path, sample_local_path, path_specific_sample_name);
-                std::cout << sample->sample_id << std::endl;
                 prg->add_sample_covgs_to_vcf(vcf, kmer_prg, vcf_reference_path, path_specific_sample_name, sample->sample_id);
             }
             count++;
         }
     }
-
     vcf.merge_multi_allelic();
     master_vcf.append_vcf(vcf);
 }
