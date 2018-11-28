@@ -328,8 +328,8 @@ int pandora_compare(int argc, char *argv[]) {
         pangenome::Node &pangraph_node = *pangraph_node_entry.second;
         const auto &prg_id = pangraph_node.prg_id;
 
-        assert(prgs.size() < prg_id);
-        assert(vcf_reference_paths.size() < prg_id);
+        assert(prgs.size() > prg_id);
+        assert(vcf_reference_paths.size() > prg_id);
 
         BOOST_LOG_TRIVIAL(debug) << " c.first: " << node_id << " prgs[c.first]->name: " << prgs[prg_id]->name;
 
