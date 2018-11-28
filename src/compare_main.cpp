@@ -322,17 +322,17 @@ int pandora_compare(int argc, char *argv[]) {
 
     VCF master_vcf;
 
-
     for (const auto &pangraph_node_entry: pangraph->nodes) {
+        BOOST_LOG_TRIVIAL(debug) << "Consider next node";
         const auto &node_id = pangraph_node_entry.first;
         pangenome::Node &pangraph_node = *pangraph_node_entry.second;
         const auto &prg_id = pangraph_node.prg_id;
 
-        std::cout << " c.first: " << node_id;
-        std::cout << " prgs[c.first]->name: " << prgs[prg_id]->name << std::endl;
+        BOOST_LOG_TRIVIAL(debug) << " c.first: " << node_id << " prgs[c.first]->name: " << prgs[prg_id]->name;
 
         if (!vcf_refs_file.empty()
             and vcf_refs.find(prgs[prg_id]->name) != vcf_refs.end()) {
+            BOOST_LOG_TRIVIAL(debug) << "Select the VCF ref for this gene";
             vcf_ref = vcf_refs[prgs[prg_id]->name];
         }
 

@@ -335,7 +335,7 @@ void Graph::setup_kmergraphs(const std::vector<std::shared_ptr<LocalPRG>> &prgs,
         if (not pangraph_node.kmer_prg.nodes.empty())
             continue;
 
-        std::cout << "setup kmergraphs for node " << pangraph_node.get_name() << std::endl;
+        BOOST_LOG_TRIVIAL(debug) << "setup kmergraphs for node " << pangraph_node.get_name();
         assert(pangraph_node.prg_id < prgs.size());
         pangraph_node.kmer_prg = prgs[pangraph_node.prg_id]->kmer_prg;
         pangraph_node.kmer_prg.setup_coverages(total_number_samples);
@@ -401,6 +401,7 @@ void Graph::copy_coverages_to_kmergraphs(const Graph &ref_pangraph, const uint32
 std::vector<std::vector<LocalNodePtr>>
 Graph::infer_vcf_reference_paths(const std::vector<std::shared_ptr<LocalPRG>> &prgs, const uint32_t &w,
                                  const std::unordered_map<std::string, std::string>& vcf_refs) {
+    BOOST_LOG_TRIVIAL(info) << "Infer VCF reference paths";
     std::vector<std::vector<LocalNodePtr>> reference_paths;
     for (const auto &node_entry: nodes) {
         const auto &node = *node_entry.second;

@@ -1360,8 +1360,7 @@ void LocalPRG::add_consensus_path_to_fastaq(Fastaq &output_fq,
                             << mean_covg;
     if (global_covg > 20 and
         (6 * mean(covgs) < global_covg or mean(covgs) > global_covg or (mode(covgs) < 3 and mean(covgs) < 3))) {
-        std::cout << now() << "Skip LocalPRG " << name << " as mode and mean along max likelihood path too low"
-                  << std::endl;
+        BOOST_LOG_TRIVIAL(info) << "Skip LocalPRG " << name << " as mode and mean along max likelihood path too low";
         kmp.clear();
         return;
     }
