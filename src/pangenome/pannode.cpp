@@ -114,7 +114,7 @@ void Node::get_read_overlap_coordinates(std::vector<std::vector<uint32_t>> &read
 
 void Node::construct_multisample_vcf(VCF &master_vcf, const std::vector<LocalNodePtr> &vcf_reference_path,
                                      const std::shared_ptr<LocalPRG> &prg, const uint32_t w) {
-    // create a with respect to this ref
+    // create a vcf with respect to this ref
     VCF vcf;
     prg->build_vcf(vcf, vcf_reference_path);
 

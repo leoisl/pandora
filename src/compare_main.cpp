@@ -328,13 +328,10 @@ int pandora_compare(int argc, char *argv[]) {
         pangenome::Node &pangraph_node = *pangraph_node_entry.second;
         const auto &prg_id = pangraph_node.prg_id;
 
-        BOOST_LOG_TRIVIAL(debug) << " c.first: " << node_id << " prgs[c.first]->name: " << prgs[prg_id]->name;
+        assert(prgs.size() < prg_id);
+        assert(vcf_reference_paths.size() < prg_id);
 
-        if (!vcf_refs_file.empty()
-            and vcf_refs.find(prgs[prg_id]->name) != vcf_refs.end()) {
-            BOOST_LOG_TRIVIAL(debug) << "Select the VCF ref for this gene";
-            vcf_ref = vcf_refs[prgs[prg_id]->name];
-        }
+        BOOST_LOG_TRIVIAL(debug) << " c.first: " << node_id << " prgs[c.first]->name: " << prgs[prg_id]->name;
 
         auto node_outdir = outdir + "/" + pangraph_node.get_name();
         fs::create_directories(node_outdir);
