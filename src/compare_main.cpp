@@ -242,7 +242,7 @@ int pandora_compare(int argc, char *argv[]) {
 
         // make output dir for this sample
         auto sample_outdir = outdir + "/" + sample_name;
-        fs::create_directories(sample_outdir + "/kmer_prgs");
+        fs::create_directories(sample_outdir);
 
         // construct the pangraph for this sample
         BOOST_LOG_TRIVIAL(info) << "Constructing pangenome::Graph from read file "
@@ -332,9 +332,6 @@ int pandora_compare(int argc, char *argv[]) {
 
         const auto vcf_reference_path = pangraph->infer_node_vcf_reference_path(pangraph_node, prg_ptr, w, vcf_refs);
         BOOST_LOG_TRIVIAL(debug) << " c.first: " << node_id << " prgs[c.first]->name: " << prg_ptr->name;
-
-        auto node_outdir = outdir + "/" + pangraph_node.get_name();
-        fs::create_directories(node_outdir);
 
         pangraph_node.construct_multisample_vcf(master_vcf, vcf_reference_path, prg_ptr, w);
     }
