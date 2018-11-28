@@ -1196,20 +1196,20 @@ uint32_t sum(const std::vector<uint32_t> &v) {
 }
 
 uint32_t mean(const std::vector<uint32_t> &v) {
-    std::string s;
+    /*std::string s;
     for (const auto &i : v)
         s += int_to_string(i) + " ";
-    BOOST_LOG_TRIVIAL(debug) << "mean of " << s;
+    BOOST_LOG_TRIVIAL(debug) << "mean of " << s;*/
     if (v.empty())
         return 0;
     return std::accumulate(v.begin(), v.end(), 0) / v.size();
 }
 
 uint32_t median(std::vector<uint32_t> v) {
-    std::string s;
+    /*std::string s;
     for (const auto &i : v)
         s += int_to_string(i) + " ";
-    BOOST_LOG_TRIVIAL(debug) << "median of " << s;
+    BOOST_LOG_TRIVIAL(debug) << "median of " << s;*/
     if (v.empty())
         return 0;
     std::sort(v.begin(), v.end());
@@ -1225,10 +1225,10 @@ uint32_t median(std::vector<uint32_t> v) {
 
 uint32_t mode(std::vector<uint32_t> v) {
     std::sort(v.begin(), v.end());
-    std::string s;
+    /*std::string s;
     for (const auto &i : v)
         s += int_to_string(i) + " ";
-    BOOST_LOG_TRIVIAL(debug) << "mode of " << s;
+    BOOST_LOG_TRIVIAL(debug) << "mode of " << s;*/
     uint32_t counter = 1;
     uint32_t max_count = 1;
     uint32_t most_common = 0;
