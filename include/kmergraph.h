@@ -61,6 +61,8 @@ public:
 
     float prob(const uint32_t &, const uint32_t &, const uint32_t &sample_id);
 
+    bool coverage_is_zeroes(const uint32_t&);
+
     float find_max_path(std::vector<KmerNodePtr> &, const uint32_t &);
 
     float find_nb_max_path(std::vector<KmerNodePtr> &, const uint32_t &sample_id);

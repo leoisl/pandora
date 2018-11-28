@@ -426,12 +426,12 @@ Graph::get_node_closest_vcf_reference(const Node &node, const uint32_t &w, const
 
     for (const auto &sample_entry: this->samples) {
         const auto &sample = sample_entry.second;
-        std::cout << *sample << std::endl;
         if (sample->paths.find(node.prg_id) == sample->paths.end()){
-            BOOST_LOG_TRIVIAL(debug) << "could not find sample path for prg " << node.prg_id;
+            BOOST_LOG_TRIVIAL(debug) << "Could not find sample path for sample " << sample->name << " and prg " << node.prg_id;
             continue;
         }
 
+        BOOST_LOG_TRIVIAL(debug) << "Increment coverages for path for sample " << sample->name << " and prg " << node.prg_id;
         const auto &sample_paths = sample->paths.at(node.prg_id);
         for (const auto &sample_path : sample_paths) {
             for (uint32_t i = 0; i != sample_path.size(); ++i) {
@@ -451,6 +451,7 @@ Graph::get_node_closest_vcf_reference(const Node &node, const uint32_t &w, const
     kmer_graph.find_max_path(kmer_path, 0);
 
     auto reference_path = prg.localnode_path_from_kmernode_path(kmer_path, w);
+    BOOST_LOG_TRIVIAL(debug) << "Found reference path to return";
     return reference_path;
 }
 

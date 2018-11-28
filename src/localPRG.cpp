@@ -567,7 +567,7 @@ LocalPRG::kmernode_path_from_localnode_path(const std::vector<LocalNodePtr> &loc
 
 std::vector<LocalNodePtr>
 LocalPRG::localnode_path_from_kmernode_path(const std::vector<KmerNodePtr> &kmernode_path, const uint32_t w) const {
-    //std::cout << now() << "Convert kmernode path to localnode path" << std::endl;
+    BOOST_LOG_TRIVIAL(debug) << "Convert kmernode path to localnode path";
     std::vector<LocalNodePtr> localnode_path, kmernode, walk_path;
     std::vector<Path> walk_paths;
     for (uint32_t i = 0; i != kmernode_path.size(); ++i) {
