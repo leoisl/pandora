@@ -114,6 +114,12 @@ int pandora_index(int argc, char *argv[]) // the "pandora index" comand
     else
         index->save(prgfile, w, k);
 
+
+    std::cout << "Stats: " << std::endl;
+    std::cout << "Total calls: " << Stats::totalCalls << std::endl;
+    std::cout << "Redundant calls: " << Stats::redundantCalls << std::endl;
+
+
     return 0;
 }
 

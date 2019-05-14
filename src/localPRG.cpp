@@ -68,7 +68,17 @@ std::string LocalPRG::string_along_path(const std::vector<LocalNodePtr> &p) {
 }
 
 
+std::set<prg::Path> Stats::alreadyComputedPaths;
+uint32_t Stats::redundantCalls = 0;
+uint32_t Stats::totalCalls = 0;
+
 std::vector<LocalNodePtr> LocalPRG::nodes_along_path(const prg::Path &p) const { //return the local nodes that contain the given kmer path
+    Stats::totalCalls++;
+    if (Stats::alreadyComputedPaths.find(p) != Stats::alreadyComputedPaths.end())
+        Stats::redundantCalls++;
+    else
+        Stats::alreadyComputedPaths.insert(p);
+
     std::vector<LocalNodePtr> path_nodes; //the local nodes path
     path_nodes.reserve(100);
 

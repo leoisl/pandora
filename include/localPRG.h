@@ -20,6 +20,13 @@
 using PanNodePtr = std::shared_ptr<pangenome::Node>;
 namespace fs = boost::filesystem;
 
+class Stats {
+public:
+    static std::set<prg::Path> alreadyComputedPaths;
+    static uint32_t redundantCalls;
+    static uint32_t totalCalls;
+};
+
 class LocalPRG {
     uint32_t next_id; //internal variables used in some methods - TODO: maybe this should not be an object variable
     std::string buff; //internal variables used in some methods - TODO: maybe this should not be an object variable
