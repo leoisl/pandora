@@ -35,6 +35,11 @@ bool Sample::operator<(const Sample &y) const {
     return (name < y.name);
 }
 
+//release the memory allocated for node_id
+void Sample::releaseNodeMemory(const uint32_t &node_id) {
+    paths[node_id].clear();
+}
+
 std::ostream &pangenome::operator<<(std::ostream &out, pangenome::Sample const &s) {
     out << s.name << ":\t";
     for (const auto &p : s.paths) {

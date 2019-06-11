@@ -30,6 +30,9 @@ public:
 
     bool operator<(const Sample &y) const;
 
+    //release the memory allocated for node_id
+    void releaseNodeMemory(const uint32_t &node_id);
+
     friend std::ostream &operator<<(std::ostream &out, const Sample &s);
 };
 

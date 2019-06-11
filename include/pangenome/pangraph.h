@@ -16,6 +16,7 @@ class KmerNode;
 #include "minihits.h"
 #include "localPRG.h"
 #include "pangenome/ns.cpp"
+#include <fstream>
 
 
 using KmerNodePtr = std::shared_ptr<KmerNode>;
@@ -24,9 +25,20 @@ using NodeId = uint32_t;
 
 
 class pangenome::Graph {
-protected:
+private:
+    //matrix output variables
+    std::ofstream matrixOutputHandle;
+    const std::vector<std::string> *matrixOutputSampleNames;
+    //matrix output variables
+
     std::unordered_map<std::string, SamplePtr> samples;
     uint32_t next_id;
+
+    ReadPtr get_read(const uint32_t &);
+
+    SamplePtr get_sample(const std::string &, const uint32_t &);
+
+
 public:
     std::map<ReadId, ReadPtr> reads;
     std::unordered_map<NodeId, NodePtr> nodes;
@@ -37,16 +49,16 @@ public:
 
     void clear();
 
+    //release the memory allocated for node_id
+    void releaseNodeMemory(const NodeId &node_id);
+
     // graph additions/removals
     void reserve_num_reads(uint32_t &);
-
-    ReadPtr get_read(const uint32_t &);
 
     NodePtr get_node(const NodeId &,
                      const uint32_t &,
                      const std::string &);
 
-    SamplePtr get_sample(const std::string &, const uint32_t &);
 
     NodePtr add_coverage(ReadPtr &read_ptr,
                          const NodeId &node_id,
@@ -91,6 +103,12 @@ public:
 
     // graph read/write
     void save_matrix(const std::string &, const std::vector<std::string> &);
+
+    //save matrix step per step
+    void init_matrix_output(const std::string &filepath, const std::vector<std::string> &sample_names);
+    void output_node_info_to_matrix(const pangenome::Node &n);
+    void close_matrix_output();
+
 
     void save_mapped_read_strings(const std::string &read_filepath, const std::string &outprefix, const int buff = 0);
 

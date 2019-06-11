@@ -323,7 +323,7 @@ int pandora_map(int argc, char *argv[]) {
     load_PRG_kmergraphs(prgs, w, k, prgfile); //load all kmer-minimizer graphs built in the index step
 
     cout << now() << "Constructing pangenome::Graph from read file (this will take a while)" << endl;
-    auto pangraph = std::make_shared<pangenome::Graph>(pangenome::Graph());
+    auto pangraph = std::make_shared<pangenome::Graph>();
     uint32_t covg = pangraph_from_read_file(reads_filepath, pangraph, index, prgs, w, k, max_diff, e_rate,
                                             min_cluster_size, genome_size, illumina, clean, max_covg, threads);
 

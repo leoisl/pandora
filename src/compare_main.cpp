@@ -302,13 +302,13 @@ int pandora_compare(int argc, char *argv[]) {
     // load read index
     std::cout << now() << "Loading read index file " << read_index_fpath << std::endl;
     auto samples = load_read_index(read_index_fpath);
-    auto pangraph = std::make_shared<pangenome::Graph>(pangenome::Graph());
+    auto pangraph = std::make_shared<pangenome::Graph>();
     std::vector<uint32_t> exp_depth_covgs;
 
     // for each sample, run pandora to get the sample pangraph
     for (uint32_t sample_id = 0; sample_id < samples.size(); ++sample_id) {
         const auto &sample = samples[sample_id];
-        auto pangraph_sample = std::make_shared<pangenome::Graph>(pangenome::Graph());
+        auto pangraph_sample = std::make_shared<pangenome::Graph>();
 
         const auto &sample_name = sample.first;
         const auto &sample_fpath = sample.second;
@@ -423,6 +423,8 @@ int pandora_compare(int argc, char *argv[]) {
     for (auto pan_id_to_node_mapping = pangraph->nodes.begin(); pan_id_to_node_mapping != pangraph->nodes.end(); ++pan_id_to_node_mapping)
         pangraphNodesAsVector.push_back(*pan_id_to_node_mapping);
 
+    //initializes the matrix which has the presence/absence of each prg in each sample
+    pangraph->init_matrix_output(outdir + "/pandora_multisample.matrix", sample_names);
     #pragma omp parallel for num_threads(threads) schedule(dynamic, 3)
     for (uint32_t pangraph_node_index=0; pangraph_node_index < pangraphNodesAsVector.size(); ++pangraph_node_index) {
         const auto &pangraph_node_entry = pangraphNodesAsVector[pangraph_node_index];
@@ -443,7 +445,17 @@ int pandora_compare(int argc, char *argv[]) {
 
         BOOST_LOG_TRIVIAL(debug) << " c.first: " << node_id << " prgs[c.first]->name: " << prg_ptr->name;
         pangraph_node.construct_multisample_vcf(master_vcf, vcf_reference_path, prg_ptr, w, min_kmer_covg);
+
+        #pragma omp critical(matrix_output)
+        {
+            // output the node info to the matrix
+            pangraph->output_node_info_to_matrix(pangraph_node);
+        }
+
+        //we don't need this node anymore
+        pangraph->releaseNodeMemory(pangraph_node.node_id);
     }
+    pangraph->close_matrix_output();
 
 
     master_vcf.save(outdir + "/pandora_multisample_consensus.vcf", true, true, true, true, true, true, true);
@@ -455,9 +467,6 @@ int pandora_compare(int argc, char *argv[]) {
         master_vcf.save(outdir + "/pandora_multisample_genotyped.vcf", true, true, true, true, true, true, true);
     }
 
-    // output a matrix/vcf which has the presence/absence of each prg in each sample
-    BOOST_LOG_TRIVIAL(info) << "Output matrix";
-    pangraph->save_matrix(outdir + "/pandora_multisample.matrix", sample_names);
 
     if (pangraph->nodes.empty()) {
         std::cout << "No LocalPRGs found to compare samples on. "

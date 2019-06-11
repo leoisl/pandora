@@ -32,6 +32,14 @@ void pangenome::Graph::clear() {
     samples.clear();
 }
 
+
+//release the memory allocated for node_id
+void pangenome::Graph::releaseNodeMemory(const NodeId &node_id) {
+    nodes[node_id].reset();
+    for (auto &samplePair : samples)
+        samplePair.second->releaseNodeMemory(node_id);
+}
+
 pangenome::Graph::~Graph() {
     clear();
 }
@@ -484,6 +492,39 @@ bool pangenome::Graph::operator==(const Graph &y) const {
 
 bool pangenome::Graph::operator!=(const Graph &y) const {
     return !(*this == y);
+}
+
+
+// initialize matrix output
+void pangenome::Graph::init_matrix_output(const std::string &filepath, const std::vector<std::string> &sample_names) {
+    // write a presence/absence matrix for samples and nodes
+    matrixOutputHandle.open(filepath);
+    matrixOutputSampleNames = &sample_names;
+
+    // save header line with sample names
+    for (const auto &name : sample_names) {
+        matrixOutputHandle << "\t" << name;
+    }
+    matrixOutputHandle << std::endl;
+}
+
+// output node to the matrix
+void pangenome::Graph::output_node_info_to_matrix(const pangenome::Node &n) {
+    const auto& sample_names = *matrixOutputSampleNames;
+    matrixOutputHandle << n.name;
+    for (const auto &name : sample_names) {
+        if (samples.find(name) == samples.end()
+            or samples[name]->paths.find(n.node_id) == samples[name]->paths.end()) {
+            matrixOutputHandle << "\t0";
+        } else {
+            matrixOutputHandle << "\t" << samples[name]->paths[n.node_id].size();
+        }
+    }
+    matrixOutputHandle << std::endl;
+}
+
+void pangenome::Graph::close_matrix_output() {
+    matrixOutputHandle.close();
 }
 
 // Saves a presence/absence/copynumber matrix for each node and each sample
