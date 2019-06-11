@@ -418,10 +418,10 @@ int pandora_compare(int argc, char *argv[]) {
 
     //transforms to a vector to parallelize this
     //TODO: use OMP task instead?
-    std::vector<std::pair<NodeId, std::shared_ptr<pangenome::Node>>> pangraphNodesAsVector;
+    std::vector<std::pair<NodeId, pangenome::Node*>> pangraphNodesAsVector;
     pangraphNodesAsVector.reserve(pangraph->nodes.size());
     for (auto pan_id_to_node_mapping = pangraph->nodes.begin(); pan_id_to_node_mapping != pangraph->nodes.end(); ++pan_id_to_node_mapping)
-        pangraphNodesAsVector.push_back(*pan_id_to_node_mapping);
+        pangraphNodesAsVector.push_back(make_pair(pan_id_to_node_mapping->first, pan_id_to_node_mapping->second.get()));
 
     //initializes the matrix which has the presence/absence of each prg in each sample
     pangraph->init_matrix_output(outdir + "/pandora_multisample.matrix", sample_names);
