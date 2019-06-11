@@ -617,7 +617,7 @@ LocalPRG::localnode_path_from_kmernode_path(const std::vector<KmerNodePtr> &kmer
         {
             break;
         }
-        kmernode = nodes_along_path(kmernode_path[i]->path);
+        kmernode = nodes_along_path_core(kmernode_path[i]->path);
 
         // if the start of the new localnode path is after the end of the previous, join up WLOG with top path
         while (!localnode_path.empty() and !localnode_path.back()->outNodes.empty() and
@@ -636,7 +636,7 @@ LocalPRG::localnode_path_from_kmernode_path(const std::vector<KmerNodePtr> &kmer
     if (localnode_path[0]->id != 0) {
         walk_paths = prg.walk(0, 0, w);
         for (uint32_t i = 0; i != walk_paths.size(); ++i) {
-            walk_path = nodes_along_path(*(walk_paths[i]));
+            walk_path = nodes_along_path_core(*(walk_paths[i]));
             // does it overlap
             uint32_t n = 0, m = 0;
             overlap = false;
@@ -681,7 +681,7 @@ LocalPRG::localnode_path_from_kmernode_path(const std::vector<KmerNodePtr> &kmer
     if (localnode_path.back()->id != prg.nodes.size() - 1) {
         walk_paths = prg.walk_back(prg.nodes.size() - 1, seq.length(), w);
         for (uint32_t i = 0; i != walk_paths.size(); ++i) {
-            walk_path = nodes_along_path(*(walk_paths[i]));
+            walk_path = nodes_along_path_core(*(walk_paths[i]));
 
             // does it overlap
             uint32_t n = localnode_path.size();
