@@ -62,33 +62,6 @@ static void show_compare_usage() {
               << std::endl;
 }
 
-using SampleIdText = std::string;
-using SampleFpath = std::string;
-
-std::vector<std::pair<SampleIdText, SampleFpath>> load_read_index(const std::string &read_index_fpath) {
-    std::map<SampleIdText, SampleFpath> samples;
-    std::string name, reads_path, line;
-    std::ifstream myfile(read_index_fpath);
-    if (myfile.is_open()) {
-        while (getline(myfile, line).good()) {
-            std::istringstream linestream(line);
-            if (std::getline(linestream, name, '\t')) {
-                linestream >> reads_path;
-                if (samples.find(name) != samples.end()) {
-                    std::cout << "Warning: non-unique sample ids given! Only the last of these will be kept"
-                              << std::endl;
-                }
-                samples[name] = reads_path;
-            }
-        }
-    } else {
-        std::cerr << "Unable to open read index file " << read_index_fpath << std::endl;
-        exit(1);
-    }
-    std::cout << now() << "Finished loading " << samples.size() << " samples from read index" << std::endl;
-    return std::vector<std::pair<SampleIdText, SampleFpath>>(samples.begin(), samples.end());
-}
-
 int pandora_compare(int argc, char *argv[]) {
     // if not enough arguments, print usage
     if (argc < 7) {

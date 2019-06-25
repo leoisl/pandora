@@ -92,7 +92,10 @@ uint32_t pangraph_from_read_file(const std::string &, std::shared_ptr<pangenome:
 //, const uint32_t, const float&, bool);
 void infer_most_likely_prg_path_for_pannode(const std::vector<std::shared_ptr<LocalPRG>> &, PanNode *, uint32_t, float);
 
-
 void fatalError (const std::string &message);
+
+using SampleIdText = std::string;
+using SampleFpath = std::string;
+std::vector<std::pair<SampleIdText, SampleFpath>> load_read_index(const std::string &read_index_fpath);
 
 #endif
