@@ -146,9 +146,7 @@ void CandidateRegion::add_pileup_entry(const std::string &read, const ReadCoordi
 }
 
 
-void CandidateRegion::write_denovo_paths_to_file(const fs::path &output_directory) {
-    fs::create_directories(output_directory);
-
+void CandidateRegion::write_denovo_paths_to_file(const fs::path &output_directory) const {
     if (denovo_paths.empty()) {
         BOOST_LOG_TRIVIAL(debug) << "No denovo paths for " << filename;
         return;
@@ -165,7 +163,7 @@ void CandidateRegion::write_denovo_paths_to_file(const fs::path &output_director
 }
 
 
-Fastaq CandidateRegion::generate_fasta_for_denovo_paths() {
+Fastaq CandidateRegion::generate_fasta_for_denovo_paths() const {
     const bool gzip { false };
     const bool fastq { false };
     Fastaq fasta { gzip, fastq };

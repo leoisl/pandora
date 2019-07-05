@@ -74,3 +74,4 @@ build/
 data_issue*
 build_release*
 build_profiling*
+/new_build/

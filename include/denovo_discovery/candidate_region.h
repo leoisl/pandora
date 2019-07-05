@@ -68,7 +68,7 @@ public:
 
     void add_pileup_entry(const std::string &read, const ReadCoordinate &read_coordinate);
 
-    void write_denovo_paths_to_file(const fs::path &output_directory);
+    void write_denovo_paths_to_file(const fs::path &output_directory) const;
 
 private:
     const Interval interval;
@@ -79,7 +79,7 @@ private:
 
     void initialise_filename();
 
-    Fastaq generate_fasta_for_denovo_paths();
+    Fastaq generate_fasta_for_denovo_paths() const;
 };
 
 

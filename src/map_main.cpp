@@ -479,13 +479,40 @@ int pandora_map(int argc, char *argv[]) {
     }
 
     if (discover_denovo) {
-        DenovoDiscovery denovo { denovo_kmer_size, e_rate };
+        //create the output folder to store denovo results
         const fs::path denovo_output_directory {fs::path(outdir) / "denovo_paths"};
+        fs::create_directories(denovo_output_directory);
 
-        for (auto &element : candidate_regions) {
-            auto &candidate_region {element.second};
-            denovo.find_paths_through_candidate_region(candidate_region); //TODO: this is hard to parallelize due to GATB's temp files
+        //parallel section!
+        //no need to sync
+        DenovoDiscovery denovo { denovo_kmer_size, e_rate };
+
+        //variables to report progress
+        const uint32_t percent_denominator = std::max((size_t)1, candidate_regions.size()/10); //a report each 10% of candidate regions processed
+        //synced by critical(number_of_candidate_regions_done)
+        uint32_t number_of_candidate_regions_done {0};
+
+        //put the candidate regions in a vector so that we can put in a #pragma omp parallel for construct
+        std::vector<CandidateRegion*> candidate_regions_in_a_vector;
+        candidate_regions_in_a_vector.reserve(candidate_regions.size());
+        for (auto &element : candidate_regions)
+            candidate_regions_in_a_vector.push_back(&(element.second));
+
+        #pragma omp parallel for num_threads(threads) schedule(dynamic, 10)
+        for (uint32_t candidate_region_index = 0; candidate_region_index < candidate_regions_in_a_vector.size(); ++candidate_region_index) {
+            auto &candidate_region {*(candidate_regions_in_a_vector[candidate_region_index])};
+            denovo.find_paths_through_candidate_region(candidate_region);
             candidate_region.write_denovo_paths_to_file(denovo_output_directory);
+
+            //update number_of_candidate_regions_done and maybe report progress
+            #pragma omp critical(number_of_candidate_regions_done)
+            {
+                ++number_of_candidate_regions_done;
+                if (number_of_candidate_regions_done % percent_denominator == 0) {
+                    BOOST_LOG_TRIVIAL(info) << ( ((double)(candidate_region_index)) / candidate_regions.size() * 100)
+                                            << "% candidate regions processed";
+                }
+            }
         }
     }
 
