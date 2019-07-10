@@ -105,6 +105,7 @@ TEST(FindPathsThroughCandidateRegionTest, emptyPileupReturnsEmpty) {
     DenovoDiscovery denovo { k, error_rate };
     CandidateRegion candidate_region { Interval(0, 1), "test" };
     candidate_region.max_likelihood_sequence = "ATGCGCTGAGAGTCGGACT";
+    candidate_region.create_local_assembly_graph(denovo);
 
     denovo.find_paths_through_candidate_region(candidate_region);
 
@@ -123,6 +124,7 @@ TEST(FindPathsThroughCandidateRegionTest, kmerSizeBiggerThanCandidateReturnsEmpt
     CandidateRegion candidate_region { Interval(0, 1), "test" };
     candidate_region.max_likelihood_sequence = "ATGCGCTGAGAGTCGGACT";
     candidate_region.pileup = { "FOO", "BAR" };
+    candidate_region.create_local_assembly_graph(denovo);
 
     denovo.find_paths_through_candidate_region(candidate_region);
 
@@ -141,6 +143,7 @@ TEST(FindPathsThroughCandidateRegionTest, passInDataThatCausesGatbErrorNoFailAnd
     CandidateRegion candidate_region { Interval(0, 1), "test" };
     candidate_region.max_likelihood_sequence = "ATGCGCTGAGAGTCGGACT";
     candidate_region.pileup = { "FOO", "BAR" };
+    candidate_region.create_local_assembly_graph(denovo);
 
     denovo.find_paths_through_candidate_region(candidate_region);
 
@@ -159,6 +162,7 @@ TEST(FindPathsThroughCandidateRegionTest, startKmersDontExistInGraphReturnEmpty)
     CandidateRegion candidate_region { Interval(0, 1), "test" };
     candidate_region.max_likelihood_sequence = "GGGGGGGGGGAGTCGGACT";
     candidate_region.pileup = { "ATGCGCTGAGAGTCGGACT", "ATGCGCTGAGAGTCGGACT" };
+    candidate_region.create_local_assembly_graph(denovo);
 
     denovo.find_paths_through_candidate_region(candidate_region);
 
@@ -176,6 +180,7 @@ TEST(FindPathsThroughCandidateRegionTest, endKmersDontExistInGraphReturnEmpty) {
     CandidateRegion candidate_region { Interval(0, 1), "test" };
     candidate_region.max_likelihood_sequence = "ATGCGCTGAGCCCCCCCCC";
     candidate_region.pileup = { "ATGCGCTGAGAGTCGGACT", "ATGCGCTGAGAGTCGGACT" };
+    candidate_region.create_local_assembly_graph(denovo);
 
     denovo.find_paths_through_candidate_region(candidate_region);
 
@@ -193,6 +198,7 @@ TEST(FindPathsThroughCandidateRegionTest, endKmerExistsInStartKmersFindPathAndCy
     CandidateRegion candidate_region { Interval(0, 1), "test" };
     candidate_region.max_likelihood_sequence = "ATGCGCTGAGATGCGCTGA";
     candidate_region.pileup = { "ATGCGCTGACATGCGCTGA", "ATGCGCTGACATGCGCTGA" };
+    candidate_region.create_local_assembly_graph(denovo);
 
     denovo.find_paths_through_candidate_region(candidate_region);
 
@@ -215,6 +221,7 @@ TEST(FindPathsThroughCandidateRegionTest, doGraphCleaningtwoIdenticalReadsPlusNo
     CandidateRegion candidate_region { Interval(0, 1), "test" };
     candidate_region.max_likelihood_sequence = "ATGCGCTGAGAGTCGGACT";
     candidate_region.pileup = { "ATGCGCTGAGAGTCGGACT", "ATGCGCTGAGAGTCGGACT", "AAATAAA", "GCGGCGCGGCC" };
+    candidate_region.create_local_assembly_graph(denovo);
 
     denovo.find_paths_through_candidate_region(candidate_region);
 
@@ -232,6 +239,7 @@ TEST(FindPathsThroughCandidateRegionTest, twoIdenticalReadsReturnOnePath) {
     CandidateRegion candidate_region { Interval(0, 1), "test" };
     candidate_region.max_likelihood_sequence = "ATGCGCTGAGAGTCGGACT";
     candidate_region.pileup = { "ATGCGCTGAGAGTCGGACT", "ATGCGCTGAGAGTCGGACT" };
+    candidate_region.create_local_assembly_graph(denovo);
 
     denovo.find_paths_through_candidate_region(candidate_region);
 
@@ -249,6 +257,7 @@ TEST(FindPathsThroughCandidateRegionTest, twoPossiblePathsWithLowCovgOnBothRetur
     CandidateRegion candidate_region { Interval(0, 1), "test" };
     candidate_region.max_likelihood_sequence = "ATGCGCTGAGAGTCGGACT";
     candidate_region.pileup = { "ATGCGCTGAGAGTCGGACT", "ATGCGCTGATAGTCGGACT" };
+    candidate_region.create_local_assembly_graph(denovo);
 
     denovo.find_paths_through_candidate_region(candidate_region);
 
@@ -267,6 +276,7 @@ TEST(FindPathsThroughCandidateRegionTest, twoPossiblePathsOneWithLowCovgOnOneRet
     CandidateRegion candidate_region { Interval(0, 1), "test" };
     candidate_region.max_likelihood_sequence = "ATGCGCTGAGAGTCGGACT";
     candidate_region.pileup = { "ATGCGCTGAGAGTCGGACT", "ATGCGCTGAGAGTCGGACT", "ATGCGCTGATAGTCGGACT" };
+    candidate_region.create_local_assembly_graph(denovo);
 
     denovo.find_paths_through_candidate_region(candidate_region);
 
@@ -286,6 +296,7 @@ TEST(FindPathsThroughCandidateRegionTest, twoPossiblePathsWithGoodCovgReturnsTwo
     candidate_region.max_likelihood_sequence = "ATGCGCTGAGAGTCGGACT";
     candidate_region.pileup = { "ATGCGCTGAGAGTCGGACT", "ATGCGCTGAGAGTCGGACT", "ATGCGCTGATAGTCGGACT",
                                 "ATGCGCTGATAGTCGGACT" };
+    candidate_region.create_local_assembly_graph(denovo);
 
     denovo.find_paths_through_candidate_region(candidate_region);
     std::sort(candidate_region.denovo_paths.begin(), candidate_region.denovo_paths.end());

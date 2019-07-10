@@ -12,23 +12,23 @@
 
 
 namespace fs = boost::filesystem;
+class CandidateRegion;
 
 
 class DenovoDiscovery {
 public:
     const uint_least8_t min_covg_for_node_in_assembly_graph { 2 };
     bool clean_assembly_graph { false };
+    const uint_least8_t kmer_size;
+    const double read_error_rate;
 
     DenovoDiscovery(const uint_least8_t &kmer_size, const double &read_error_rate);
 
-    void find_paths_through_candidate_region(CandidateRegion &candidate_region);
+    void find_paths_through_candidate_region(CandidateRegion &candidate_region) const;
 
     double calculate_kmer_coverage(const uint32_t &read_covg, const uint32_t &ref_length) const;
 
 private:
-    const uint_least8_t kmer_size;
-    const double read_error_rate;
-
 };
 
 

@@ -8,20 +8,24 @@ size_t std::hash<CandidateRegionIdentifier>::operator()(const CandidateRegionIde
 
 
 CandidateRegion::CandidateRegion(const Interval &interval, std::string name)
-        : interval { interval }, name { std::move(name) }, interval_padding { 0 } {
+        : interval { interval }, name { std::move(name) }, interval_padding { 0 }, graph_files_are_created { false },
+          graph_was_correctly_built{ false } {
     initialise_filename();
     omp_init_lock(&add_pileup_entry_lock);
 }
 
 
 CandidateRegion::CandidateRegion(const Interval &interval, std::string name, const uint_least16_t &interval_padding)
-        : interval { interval }, name { std::move(name) }, interval_padding { interval_padding } {
+        : interval { interval }, name { std::move(name) }, interval_padding { interval_padding }, graph_files_are_created { false },
+          graph_was_correctly_built { false } {
     initialise_filename();
     omp_init_lock(&add_pileup_entry_lock);
 }
 
 CandidateRegion::~CandidateRegion() {
     omp_destroy_lock(&add_pileup_entry_lock);
+    if (graph_files_are_created) remove_graph_file(gatb_graph_filepath);
+
 }
 
 void CandidateRegion::initialise_filename() {
@@ -146,9 +150,7 @@ void CandidateRegion::add_pileup_entry(const std::string &read, const ReadCoordi
 }
 
 
-void CandidateRegion::write_denovo_paths_to_file(const fs::path &output_directory) {
-    fs::create_directories(output_directory);
-
+void CandidateRegion::write_denovo_paths_to_file(const fs::path &output_directory) const {
     if (denovo_paths.empty()) {
         BOOST_LOG_TRIVIAL(debug) << "No denovo paths for " << filename;
         return;
@@ -165,7 +167,7 @@ void CandidateRegion::write_denovo_paths_to_file(const fs::path &output_director
 }
 
 
-Fastaq CandidateRegion::generate_fasta_for_denovo_paths() {
+Fastaq CandidateRegion::generate_fasta_for_denovo_paths() const {
     const bool gzip { false };
     const bool fastq { false };
     Fastaq fasta { gzip, fastq };
@@ -204,9 +206,10 @@ PileupConstructionMap construct_pileup_construction_map(CandidateRegions &candid
 
 
 void
-load_all_candidate_regions_pileups_from_fastq(const fs::path &reads_filepath, const CandidateRegions &candidate_regions,
-                                              const PileupConstructionMap &pileup_construction_map, const uint32_t threads) {
-    BOOST_LOG_TRIVIAL(info) << " Loading all candidate regions pileups from " << reads_filepath.string() << " ...";
+load_all_candidate_regions_pileups_from_fastq(const fs::path &reads_filepath, CandidateRegions &candidate_regions,
+                                              const PileupConstructionMap &pileup_construction_map, const uint32_t threads,
+                                              const bool clear_read_coordinates /*set this to true if you want to be RAM efficient*/) {
+    BOOST_LOG_TRIVIAL(info) << "Loading all candidate regions pileups from " << reads_filepath.string() << " ...";
 
     if (candidate_regions.empty() or pileup_construction_map.empty())
         return;
@@ -276,5 +279,85 @@ load_all_candidate_regions_pileups_from_fastq(const fs::path &reads_filepath, co
 
         }
     }
-    BOOST_LOG_TRIVIAL(info) << " Loaded all candidate regions pileups from " << reads_filepath.string();
+
+    if (clear_read_coordinates) {
+        //now that we loaded all the pileups for each candidate region, we clear up their read_coordinates as they are not needed anymore
+        //to save some RAM for the later steps
+        for (auto &element : candidate_regions) {
+            auto &candidate_region{element.second};
+            candidate_region.clear_read_coordinates();
+        }
+    }
+
+    BOOST_LOG_TRIVIAL(info) << "Loaded all candidate regions pileups from " << reads_filepath.string();
+}
+
+
+void CandidateRegion::create_local_assembly_graph (const DenovoDiscovery &denovo, uint32_t threads) {
+    const auto read_covg{pileup.size()};
+    const auto length_of_candidate_sequence{max_likelihood_sequence.length()};
+    expected_kmer_covg = denovo.calculate_kmer_coverage(read_covg, length_of_candidate_sequence);
+
+    BOOST_LOG_TRIVIAL(debug) << "Running local assembly for: " << get_name() << " - interval ["
+                             << get_interval() << "]";
+
+    if (pileup.empty()) {
+        BOOST_LOG_TRIVIAL(debug) << "No sequences to assemble. Skipping local assembly.";
+        return;
+    }
+
+    max_path_length = length_of_candidate_sequence + 50;
+
+    if (denovo.kmer_size > max_path_length) {
+        BOOST_LOG_TRIVIAL(debug) << "Kmer size " << denovo.kmer_size << " is greater than the maximum path length "
+                                 << max_path_length << ". Skipping local assembly.";
+        return;
+    }
+
+
+    gatb_graph_filepath = std::string("graph_") + filename.string();
+    try {
+        graph_files_are_created = true;
+        Graph gatb_graph = LocalAssemblyGraph::create(new BankStrings(pileup),
+                                                      "-kmer-size %d -abundance-min %d -out %s -nb-cores %d -verbose 0",
+                                                      denovo.kmer_size, denovo.min_covg_for_node_in_assembly_graph,
+                                                      gatb_graph_filepath.string().c_str(), threads);
+
+        if (denovo.clean_assembly_graph) {
+            clean(gatb_graph);
+        }
+        graph = gatb_graph; //TODO: use move constructor?
+        graph_was_correctly_built = true;
+
+    } catch (gatb::core::system::Exception &error) {
+        BOOST_LOG_TRIVIAL(debug) << "Couldn't create GATB graph." << "\n\tEXCEPTION: " << error.getMessage();
+    }
+}
+
+void create_all_local_assembly_graphs(CandidateRegions &candidate_regions, const DenovoDiscovery &denovo,
+                                      const uint32_t threads, const bool clear_pileup /*set this to true if you want to be RAM efficient*/) {
+    //create the GATB graph for each candidate region
+    BOOST_LOG_TRIVIAL(info) << "Creating a GATB graph for each candidate region...";
+    for (auto &element : candidate_regions) {
+        auto &candidate_region{element.second};
+        candidate_region.create_local_assembly_graph(denovo, threads);
+
+        if (clear_pileup) {
+            //clear up the pileup after building the graph to save memory
+            //the pileup is represented by the graph, so no need to store it anymore
+            candidate_region.clear_pileup();
+        }
+    }
+    BOOST_LOG_TRIVIAL(info) << "Finished creating a GATB graph for each candidate region";
+}
+
+void CandidateRegion::clear() {
+    read_coordinates.clear();
+    max_likelihood_sequence.clear();
+    left_flanking_sequence.clear();
+    right_flanking_sequence.clear();
+    pileup.clear();
+    filename.clear();
+    denovo_paths.clear();
+    //graph.remove(); //we can't remove the GATB graph multithreadely without getting a segfault
 }

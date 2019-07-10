@@ -9,6 +9,7 @@
 #include "fastaq.h"
 #include "fastaq_handler.h"
 #include "localPRG.h"
+#include "denovo_discovery.h"
 #include <omp.h>
 
 
@@ -37,6 +38,7 @@ using DenovoPaths = std::vector<std::string>;
 using ReadPileup = std::vector<std::string>;
 using ReadCoordinates = std::set<ReadCoordinate>;
 
+class DenovoDiscovery;
 
 class CandidateRegion {
 public:
@@ -47,6 +49,14 @@ public:
     ReadPileup pileup;
     fs::path filename;
     DenovoPaths denovo_paths;
+
+    //variables concerning the GATB graph
+    bool graph_files_are_created;
+    bool graph_was_correctly_built;
+    fs::path gatb_graph_filepath;
+    LocalAssemblyGraph graph;
+    uint32_t max_path_length;
+    double expected_kmer_covg;
 
     CandidateRegion(const Interval &interval, std::string name);
 
@@ -68,7 +78,24 @@ public:
 
     void add_pileup_entry(const std::string &read, const ReadCoordinate &read_coordinate);
 
-    void write_denovo_paths_to_file(const fs::path &output_directory);
+    void write_denovo_paths_to_file(const fs::path &output_directory) const;
+
+    void create_local_assembly_graph (const DenovoDiscovery &denovo, uint32_t threads = 1);
+
+    //this is a RAM efficiency-related method that can be called **after** all candidate regions pileups were loaded into memory
+    //after this happens, all the read pileups are themselves stored,
+    //so there is no need to store the read coordinates for these pileups, saving some RAM
+    void clear_read_coordinates() { read_coordinates.clear(); }
+
+    //this is a RAM efficiency-related method that can be called **after** CandidateRegion::create_local_assembly_graph() method
+    //after the local assembly graph is created for a candidate region, there is no need to store the read pileups for it,
+    //so we can remove them and save some RAM
+    void clear_pileup() { pileup.clear(); }
+
+    //this is a RAM efficiency-related method that can be called **after** CandidateRegion::write_denovo_paths_to_file() method
+    //after writing the de-novo paths, we don't need to store any information about this candidate region, freeing up memory
+    //for the others
+    void clear();
 
 private:
     const Interval interval;
@@ -79,7 +106,7 @@ private:
 
     void initialise_filename();
 
-    Fastaq generate_fasta_for_denovo_paths();
+    Fastaq generate_fasta_for_denovo_paths() const;
 };
 
 
@@ -99,7 +126,11 @@ using PileupConstructionMap = std::map<ReadId, std::vector<std::pair<CandidateRe
 PileupConstructionMap construct_pileup_construction_map(CandidateRegions &candidate_regions);
 
 void
-load_all_candidate_regions_pileups_from_fastq(const fs::path &reads_filepath, const CandidateRegions &candidate_regions,
-                                              const PileupConstructionMap &pileup_construction_map, const uint32_t threads=1);
+load_all_candidate_regions_pileups_from_fastq(const fs::path &reads_filepath, CandidateRegions &candidate_regions,
+                                              const PileupConstructionMap &pileup_construction_map, const uint32_t threads,
+                                              const bool clear_read_coordinates /*set this to true if you want to be RAM efficient*/);
+
+void create_all_local_assembly_graphs(CandidateRegions &candidate_regions, const DenovoDiscovery &denovo,
+                                      const uint32_t threads, const bool clear_pileup /*set this to true if you want to be RAM efficient*/);
 
 #endif //PANDORA_CANDIDATE_REGION_H

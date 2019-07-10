@@ -1,43 +1,10 @@
 #include "denovo_discovery/denovo_discovery.h"
 
 
-void DenovoDiscovery::find_paths_through_candidate_region(CandidateRegion &candidate_region) {
-    const auto read_covg { candidate_region.pileup.size() };
-    const auto length_of_candidate_sequence { candidate_region.max_likelihood_sequence.length() };
-    const double expected_kmer_covg { calculate_kmer_coverage(read_covg, length_of_candidate_sequence) };
+void DenovoDiscovery::find_paths_through_candidate_region(CandidateRegion &candidate_region) const {
+    if (not candidate_region.graph_was_correctly_built) return;
 
-    BOOST_LOG_TRIVIAL(debug) << "Running local assembly for: " << candidate_region.get_name() << " - interval ["
-                             << candidate_region.get_interval() << "]";
-
-    if (candidate_region.pileup.empty()) {
-        BOOST_LOG_TRIVIAL(debug) << "No sequences to assemble. Skipping local assembly.";
-        return;
-    }
-
-    const auto max_path_length { length_of_candidate_sequence + 50 };
-
-    if (kmer_size > max_path_length) {
-        BOOST_LOG_TRIVIAL(debug) << "Kmer size " << kmer_size << " is greater than the maximum path length "
-                                 << max_path_length << ". Skipping local assembly.";
-        return;
-    }
-
-    LocalAssemblyGraph graph;
-
-    try {
-        Graph gatb_graph = LocalAssemblyGraph::create(new BankStrings(candidate_region.pileup),
-                                                      "-kmer-size %d -abundance-min %d -verbose 0 -nb-cores 1", kmer_size,
-                                                      min_covg_for_node_in_assembly_graph);
-        if (clean_assembly_graph) {
-            clean(gatb_graph);
-        }
-        graph = gatb_graph; //TODO: use move constructor
-
-    } catch (gatb::core::system::Exception &error) {
-        BOOST_LOG_TRIVIAL(debug) << "Couldn't create GATB graph." << "\n\tEXCEPTION: " << error.getMessage();
-        remove_graph_file();
-        return;
-    }
+    auto &graph = candidate_region.graph;
 
     Node start_node, end_node;
     bool start_found { false };
@@ -62,7 +29,7 @@ void DenovoDiscovery::find_paths_through_candidate_region(CandidateRegion &candi
                 auto tree_of_nodes_visited_during_dfs { graph.depth_first_search_from(start_node) };
                 auto denovo_paths {
                         graph.get_paths_between(current_start_kmer, current_end_kmer, tree_of_nodes_visited_during_dfs,
-                                                max_path_length, expected_kmer_covg) };
+                                                candidate_region.max_path_length, candidate_region.expected_kmer_covg) };
                 candidate_region.denovo_paths.insert(candidate_region.denovo_paths.begin(), denovo_paths.begin(),
                                                      denovo_paths.end());
                 if (not candidate_region.denovo_paths.empty()) {
@@ -80,15 +47,12 @@ void DenovoDiscovery::find_paths_through_candidate_region(CandidateRegion &candi
                     }
                 }
 
-                remove_graph_file();
                 return;
             }
         }
     }
     BOOST_LOG_TRIVIAL(debug) << "Could not find any combination of start and end k-mers. Skipping local assembly for "
                              << candidate_region.get_name();
-    remove_graph_file();
-
 }
 
 

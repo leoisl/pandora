@@ -814,7 +814,7 @@ TEST(LoadAllCandidateRegionsPileupsFromFastq, emptyCandidateRegionReturnsEmptyPi
 
     CandidateRegions candidate_regions;
     auto pileup_construction_map = construct_pileup_construction_map(candidate_regions);
-    load_all_candidate_regions_pileups_from_fastq(temp_reads_filepath, candidate_regions, pileup_construction_map);
+    load_all_candidate_regions_pileups_from_fastq(temp_reads_filepath, candidate_regions, pileup_construction_map, 1, false);
 
     const auto temp_removed_successfully { fs::remove(temp_reads_filepath) };
     ASSERT_TRUE(temp_removed_successfully);
@@ -836,7 +836,7 @@ TEST(AddPileupEntryForCandidateRegionTest, oneCandidateZeroReadsInFilePileupHasZ
 
     CandidateRegions candidate_regions { std::make_pair(candidate.get_id(), candidate) };
     auto pileup_construction_map = construct_pileup_construction_map(candidate_regions);
-    load_all_candidate_regions_pileups_from_fastq(temp_reads_filepath, candidate_regions, pileup_construction_map);
+    load_all_candidate_regions_pileups_from_fastq(temp_reads_filepath, candidate_regions, pileup_construction_map, 1, false);
 
     const auto temp_removed_successfully { fs::remove(temp_reads_filepath) };
     ASSERT_TRUE(temp_removed_successfully);
@@ -869,7 +869,7 @@ TEST(AddPileupEntryForCandidateRegionTest, oneCandidateTwoReadsInFileOneReadInCa
 
     CandidateRegions candidate_regions { std::make_pair(candidate.get_id(), candidate) };
     auto pileup_construction_map = construct_pileup_construction_map(candidate_regions);
-    load_all_candidate_regions_pileups_from_fastq(temp_reads_filepath, candidate_regions, pileup_construction_map);
+    load_all_candidate_regions_pileups_from_fastq(temp_reads_filepath, candidate_regions, pileup_construction_map, 1, false);
 
     const auto temp_removed_successfully { fs::remove(temp_reads_filepath) };
     ASSERT_TRUE(temp_removed_successfully);
@@ -902,7 +902,7 @@ TEST(AddPileupEntryForCandidateRegionTest, oneCandidateTwoReadsInFileTwoReadsInC
 
     CandidateRegions candidate_regions { std::make_pair(candidate.get_id(), candidate) };
     auto pileup_construction_map = construct_pileup_construction_map(candidate_regions);
-    load_all_candidate_regions_pileups_from_fastq(temp_reads_filepath, candidate_regions, pileup_construction_map);
+    load_all_candidate_regions_pileups_from_fastq(temp_reads_filepath, candidate_regions, pileup_construction_map, 1, false);
 
     const auto temp_removed_successfully { fs::remove(temp_reads_filepath) };
     ASSERT_TRUE(temp_removed_successfully);
@@ -934,7 +934,7 @@ TEST(AddPileupEntryForCandidateRegionTest, twoCandidatesZeroReadsInFilePileupHas
     CandidateRegions candidate_regions { std::make_pair(candidate_1.get_id(), candidate_1),
                                          std::make_pair(candidate_2.get_id(), candidate_2) };
     auto pileup_construction_map = construct_pileup_construction_map(candidate_regions);
-    load_all_candidate_regions_pileups_from_fastq(temp_reads_filepath, candidate_regions, pileup_construction_map);
+    load_all_candidate_regions_pileups_from_fastq(temp_reads_filepath, candidate_regions, pileup_construction_map, 1, false);
 
     const auto temp_removed_successfully { fs::remove(temp_reads_filepath) };
     ASSERT_TRUE(temp_removed_successfully);
@@ -972,7 +972,7 @@ TEST(AddPileupEntryForCandidateRegionTest, twoCandidatesTwoReadsInFileOneReadInO
     CandidateRegions candidate_regions { std::make_pair(candidate_1.get_id(), candidate_1),
                                          std::make_pair(candidate_2.get_id(), candidate_2) };
     auto pileup_construction_map = construct_pileup_construction_map(candidate_regions);
-    load_all_candidate_regions_pileups_from_fastq(temp_reads_filepath, candidate_regions, pileup_construction_map);
+    load_all_candidate_regions_pileups_from_fastq(temp_reads_filepath, candidate_regions, pileup_construction_map, 1, false);
 
     const auto temp_removed_successfully { fs::remove(temp_reads_filepath) };
     ASSERT_TRUE(temp_removed_successfully);
@@ -1012,7 +1012,7 @@ TEST(AddPileupEntryForCandidateRegionTest, twoCandidatesTwoReadsInFileOneReadInE
     CandidateRegions candidate_regions { std::make_pair(candidate_1.get_id(), candidate_1),
                                          std::make_pair(candidate_2.get_id(), candidate_2) };
     auto pileup_construction_map = construct_pileup_construction_map(candidate_regions);
-    load_all_candidate_regions_pileups_from_fastq(temp_reads_filepath, candidate_regions, pileup_construction_map);
+    load_all_candidate_regions_pileups_from_fastq(temp_reads_filepath, candidate_regions, pileup_construction_map, 1, false);
 
     const auto temp_removed_successfully { fs::remove(temp_reads_filepath) };
     ASSERT_TRUE(temp_removed_successfully);
@@ -1057,7 +1057,7 @@ TEST(AddPileupEntryForCandidateRegionTest, twoCandidatesTwoReadsInFileOneReadInE
     CandidateRegions candidate_regions { std::make_pair(candidate_1.get_id(), candidate_1),
                                          std::make_pair(candidate_2.get_id(), candidate_2) };
     auto pileup_construction_map = construct_pileup_construction_map(candidate_regions);
-    load_all_candidate_regions_pileups_from_fastq(temp_reads_filepath, candidate_regions, pileup_construction_map, threads);
+    load_all_candidate_regions_pileups_from_fastq(temp_reads_filepath, candidate_regions, pileup_construction_map, threads, false);
 
     const auto temp_removed_successfully { fs::remove(temp_reads_filepath) };
     ASSERT_TRUE(temp_removed_successfully);

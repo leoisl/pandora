@@ -441,17 +441,6 @@ int pandora_map(int argc, char *argv[]) {
         }
     }
 
-    //build the pileup for candidate regions multithreadly
-    if (discover_denovo) {
-        //the construct_pileup_construction_map function is intentionally left single threaded since it would require too much synchronization
-        const auto pileup_construction_map = construct_pileup_construction_map(candidate_regions);
-
-        load_all_candidate_regions_pileups_from_fastq(reads_filepath, candidate_regions, pileup_construction_map, threads);
-    }
-
-
-
-
     //remove the nodes marked as to be removed
     for (const auto &node_to_remove : nodes_to_remove)
         pangraph->remove_node(node_to_remove);
@@ -479,14 +468,41 @@ int pandora_map(int argc, char *argv[]) {
     }
 
     if (discover_denovo) {
-        DenovoDiscovery denovo { denovo_kmer_size, e_rate };
-        const fs::path denovo_output_directory {fs::path(outdir) / "denovo_paths"};
+        //build the pileup for candidate regions multithreadly
+        {
+            //the construct_pileup_construction_map function is intentionally left single threaded since it would require too much synchronization
+            const auto pileup_construction_map = construct_pileup_construction_map(candidate_regions);
 
-        for (auto &element : candidate_regions) {
-            auto &candidate_region {element.second};
-            denovo.find_paths_through_candidate_region(candidate_region); //TODO: this is hard to parallelize due to GATB's temp files
-            candidate_region.write_denovo_paths_to_file(denovo_output_directory);
+            load_all_candidate_regions_pileups_from_fastq(reads_filepath, candidate_regions, pileup_construction_map, threads, true);
         }
+
+        DenovoDiscovery denovo { denovo_kmer_size, e_rate };
+
+        create_all_local_assembly_graphs(candidate_regions, denovo, threads, true);
+
+        //create the output folder to store denovo results
+        const fs::path denovo_output_directory {fs::path(outdir) / "denovo_paths"};
+        fs::create_directories(denovo_output_directory);
+
+        //parallel section!
+        //put the candidate regions in a vector so that we can put in a #pragma omp parallel for construct
+        std::vector<CandidateRegion*> candidate_regions_in_a_vector;
+        candidate_regions_in_a_vector.reserve(candidate_regions.size());
+        for (auto &element : candidate_regions)
+            candidate_regions_in_a_vector.push_back(&(element.second));
+
+        //find and write all denovo paths multithreadely
+        BOOST_LOG_TRIVIAL(info) << "Finding all denovo paths through candidate regions...";
+        #pragma omp parallel for num_threads(threads) schedule(dynamic, 10)
+        for (uint32_t candidate_region_index = 0; candidate_region_index < candidate_regions_in_a_vector.size(); ++candidate_region_index) {
+            auto &candidate_region {*(candidate_regions_in_a_vector[candidate_region_index])};
+            denovo.find_paths_through_candidate_region(candidate_region);
+            candidate_region.write_denovo_paths_to_file(denovo_output_directory);
+
+            //we don't need this candidate_region anymore - we clear up its memory to be used by the others
+            candidate_region.clear();
+        }
+        BOOST_LOG_TRIVIAL(info) << "Finished finding all denovo paths through candidate regions";
     }
 
 

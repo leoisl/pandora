@@ -10,7 +10,7 @@ const uint32_t g_test_max_path { 50 };
 
 TEST(GetNodeFromGraph, LowestKmerOfNode_KmerFoundInGraphAndNeighbour) {
     LocalAssemblyGraph graph;
-    graph = LocalAssemblyGraph::create(new BankStrings("AATGTCAGG", NULL), "-kmer-size %d -abundance-min 1 -verbose 0",
+    graph = LocalAssemblyGraph::create(new BankStrings("AATGTCAGG", NULL), "-kmer-size %d -abundance-min 1 -verbose 0 -nb-cores 1",
                                        TEST_KMER_SIZE);
     auto kmer = "AATGT";
     Node real_node;
@@ -26,14 +26,15 @@ TEST(GetNodeFromGraph, LowestKmerOfNode_KmerFoundInGraphAndNeighbour) {
     auto &expected = kmer;
 
     EXPECT_EQ(expected, result);
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 
 }
 
 
 TEST(GetNodeFromGraph, HighestKmerOfNode_KmerFoundInGraph) {
     LocalAssemblyGraph graph;
-    graph = LocalAssemblyGraph::create(new BankStrings("AATGTCAGG", NULL), "-kmer-size %d -abundance-min 1 -verbose 0",
+    graph = LocalAssemblyGraph::create(new BankStrings("AATGTCAGG", NULL), "-kmer-size %d -abundance-min 1 -verbose 0 -nb-cores 1",
                                        TEST_KMER_SIZE);
     auto kmer = "ACATT";
 
@@ -45,14 +46,15 @@ TEST(GetNodeFromGraph, HighestKmerOfNode_KmerFoundInGraph) {
     auto &expected = kmer;
 
     EXPECT_EQ(expected, result);
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 }
 
 
 TEST(GetNodeFromGraph, HighestKmerOfNode_KmerFoundInGraphAndNeighbour) {
     LocalAssemblyGraph graph;
     graph = LocalAssemblyGraph::create(new BankStrings("TCGTTGTCACT", NULL),
-                                       "-kmer-size %d -abundance-min 1 -verbose 0", TEST_KMER_SIZE);
+                                       "-kmer-size %d -abundance-min 1 -verbose 0 -nb-cores 1", TEST_KMER_SIZE);
 
     const auto kmer { "TCGTT" };
 
@@ -74,14 +76,15 @@ TEST(GetNodeFromGraph, HighestKmerOfNode_KmerFoundInGraphAndNeighbour) {
 
     EXPECT_EQ(result_neighbour, expected_neighbour);
 
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 }
 
 
 TEST(GetNodeFromGraph, LowestKmerOfStartNode_KmerFoundInGraphButNotNeighbourOfStart) {
     LocalAssemblyGraph graph;
     graph = LocalAssemblyGraph::create(new BankStrings("TCGTTGTCACT", NULL),
-                                       "-kmer-size %d -abundance-min 1 -verbose 0", TEST_KMER_SIZE);
+                                       "-kmer-size %d -abundance-min 1 -verbose 0 -nb-cores 1", TEST_KMER_SIZE);
 
     const auto kmer { "AACGA" };
 
@@ -103,14 +106,15 @@ TEST(GetNodeFromGraph, LowestKmerOfStartNode_KmerFoundInGraphButNotNeighbourOfSt
 
     EXPECT_NE(result_neighbour, expected_neighbour);  // NE = not equal
 
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 }
 
 
 TEST(GetNodeFromGraph, RevcompKmerOfInitialSeq_KmerFoundInGraphAndCorrectNeighbourFound) {
     LocalAssemblyGraph graph;
     graph = LocalAssemblyGraph::create(new BankStrings("TCGTTGTCACT", NULL),
-                                       "-kmer-size %d -abundance-min 1 -verbose 0", TEST_KMER_SIZE);
+                                       "-kmer-size %d -abundance-min 1 -verbose 0 -nb-cores 1", TEST_KMER_SIZE);
 
     const auto kmer { "TGACA" };
 
@@ -132,13 +136,14 @@ TEST(GetNodeFromGraph, RevcompKmerOfInitialSeq_KmerFoundInGraphAndCorrectNeighbo
 
     EXPECT_EQ(result_neighbour, expected_neighbour);
 
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 }
 
 
 TEST(GetNodeFromGraph, NonExistentKmer_NotFoundInGraphAndNodeEmpty) {
     LocalAssemblyGraph graph;
-    graph = LocalAssemblyGraph::create(new BankStrings("AATGTCAGG", NULL), "-kmer-size %d -abundance-min 1 -verbose 0",
+    graph = LocalAssemblyGraph::create(new BankStrings("AATGTCAGG", NULL), "-kmer-size %d -abundance-min 1 -verbose 0 -nb-cores 1",
                                        TEST_KMER_SIZE);
     auto kmer = "ACTGT";
 
@@ -150,7 +155,8 @@ TEST(GetNodeFromGraph, NonExistentKmer_NotFoundInGraphAndNodeEmpty) {
     Node expected = {};
 
     EXPECT_EQ(expected, result);
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 }
 
 
@@ -161,7 +167,7 @@ TEST(GetPathsBetweenTest, OnlyReturnPathsBetweenStartAndEndKmers) {
     std::vector<std::string> seqs = { s1, s2, s3 };
 
     LocalAssemblyGraph graph;
-    graph = LocalAssemblyGraph::create(new BankStrings(seqs), "-kmer-size %d -abundance-min 1 -verbose 0",
+    graph = LocalAssemblyGraph::create(new BankStrings(seqs), "-kmer-size %d -abundance-min 1 -verbose 0 -nb-cores 1",
                                        TEST_KMER_SIZE);
 
     Node start_node;
@@ -175,7 +181,8 @@ TEST(GetPathsBetweenTest, OnlyReturnPathsBetweenStartAndEndKmers) {
 
     DenovoPaths expected_seqs(seqs.begin(), seqs.end());
     EXPECT_EQ(result, expected_seqs);
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 }
 
 
@@ -189,7 +196,7 @@ TEST(GetPathsBetweenTest, lotsOfHighCovgCyclesReturnEmpty) {
     const auto expected_coverage { 4 };
 
     LocalAssemblyGraph graph;
-    graph = LocalAssemblyGraph::create(new BankStrings(seqs), "-kmer-size %d -abundance-min 1 -verbose 0",
+    graph = LocalAssemblyGraph::create(new BankStrings(seqs), "-kmer-size %d -abundance-min 1 -verbose 0 -nb-cores 1",
                                        TEST_KMER_SIZE);
 
     Node start_node;
@@ -199,7 +206,8 @@ TEST(GetPathsBetweenTest, lotsOfHighCovgCyclesReturnEmpty) {
 
     auto actual { graph.get_paths_between(start_kmer, end_kmer, tree, max_path_length, expected_coverage) };
     DenovoPaths expected;
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 
     EXPECT_EQ(actual, expected);
 }
@@ -211,7 +219,7 @@ TEST(DepthFirstSearchFromTest, SimpleGraphTwoNodesReturnSeqPassedIn) {
     const auto end_kmer { "TGCAG" };
 
     LocalAssemblyGraph graph;
-    graph = LocalAssemblyGraph::create(new BankStrings(seq, NULL), "-kmer-size %d -abundance-min 1 -verbose 0",
+    graph = LocalAssemblyGraph::create(new BankStrings(seq, NULL), "-kmer-size %d -abundance-min 1 -verbose 0 -nb-cores 1",
                                        TEST_KMER_SIZE);
 
     Node start_node;
@@ -223,7 +231,8 @@ TEST(DepthFirstSearchFromTest, SimpleGraphTwoNodesReturnSeqPassedIn) {
 
     EXPECT_EQ(result.size(), 1);
     EXPECT_EQ(*result.begin(), seq);
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 }
 
 
@@ -233,7 +242,7 @@ TEST(DepthFirstSearchFromTest, SimpleGraphSixNodesReturnSeqPassedIn) {
     const auto end_kmer { "GTACA" };
 
     LocalAssemblyGraph graph;
-    graph = LocalAssemblyGraph::create(new BankStrings(seq, NULL), "-kmer-size %d -abundance-min 1 -verbose 0",
+    graph = LocalAssemblyGraph::create(new BankStrings(seq, NULL), "-kmer-size %d -abundance-min 1 -verbose 0 -nb-cores 1",
                                        TEST_KMER_SIZE);
 
     Node start_node;
@@ -255,7 +264,8 @@ TEST(DepthFirstSearchFromTest, SimpleGraphSixNodesReturnSeqPassedIn) {
     }
 
     EXPECT_TRUE(original_seq_found);
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 }
 
 
@@ -267,7 +277,7 @@ TEST(DepthFirstSearchFromTest, TwoReadsSameSequenceReturnOneSequence) {
     const auto end_kmer { "TGCAG" };
 
     LocalAssemblyGraph graph;
-    graph = LocalAssemblyGraph::create(new BankStrings(seqs), "-kmer-size %d -abundance-min 1 -verbose 0",
+    graph = LocalAssemblyGraph::create(new BankStrings(seqs), "-kmer-size %d -abundance-min 1 -verbose 0 -nb-cores 1",
                                        TEST_KMER_SIZE);
 
     Node start_node;
@@ -279,7 +289,8 @@ TEST(DepthFirstSearchFromTest, TwoReadsSameSequenceReturnOneSequence) {
 
     EXPECT_EQ(result.size(), 1);
     EXPECT_EQ(*result.begin(), seq1);
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 }
 
 
@@ -291,7 +302,7 @@ TEST(DepthFirstSearchFromTest, TwoReadsOneVariantReturnOriginalTwoSequences) {
     const auto end_kmer { "TACAA" };
 
     LocalAssemblyGraph graph;
-    graph = LocalAssemblyGraph::create(new BankStrings(seqs), "-kmer-size %d -abundance-min 1 -verbose 0",
+    graph = LocalAssemblyGraph::create(new BankStrings(seqs), "-kmer-size %d -abundance-min 1 -verbose 0 -nb-cores 1",
                                        TEST_KMER_SIZE);
 
     Node start_node;
@@ -312,7 +323,8 @@ TEST(DepthFirstSearchFromTest, TwoReadsOneVariantReturnOriginalTwoSequences) {
         }
     }
     EXPECT_EQ(original_seq_found, seqs.size());
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 }
 
 
@@ -325,7 +337,7 @@ TEST(DepthFirstSearchFromTest, ThreeReadsTwoVariantsReturnOriginalSequences) {
     const auto end_kmer { "TACAA" };
 
     LocalAssemblyGraph graph;
-    graph = LocalAssemblyGraph::create(new BankStrings(seqs), "-kmer-size %d -abundance-min 1 -verbose 0",
+    graph = LocalAssemblyGraph::create(new BankStrings(seqs), "-kmer-size %d -abundance-min 1 -verbose 0 -nb-cores 1",
                                        TEST_KMER_SIZE);
 
     Node start_node;
@@ -348,7 +360,8 @@ TEST(DepthFirstSearchFromTest, ThreeReadsTwoVariantsReturnOriginalSequences) {
         }
     }
     EXPECT_EQ(original_seq_found, seqs.size());
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 }
 
 
@@ -360,7 +373,7 @@ TEST(DepthFirstSearchFromTest, TwoReadsTwoVariantsReturnOriginalTwoSequencesPlus
     const auto end_kmer { "TTATG" };
 
     LocalAssemblyGraph graph;
-    graph = LocalAssemblyGraph::create(new BankStrings(seqs), "-kmer-size %d -abundance-min 1 -verbose 0",
+    graph = LocalAssemblyGraph::create(new BankStrings(seqs), "-kmer-size %d -abundance-min 1 -verbose 0 -nb-cores 1",
                                        TEST_KMER_SIZE);
 
     Node start_node;
@@ -377,7 +390,8 @@ TEST(DepthFirstSearchFromTest, TwoReadsTwoVariantsReturnOriginalTwoSequencesPlus
     std::sort(expected_seqs.begin(), expected_seqs.end());
 
     EXPECT_EQ(result, expected_seqs);
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 
 }
 
@@ -391,7 +405,7 @@ TEST(DepthFirstSearchFromTest, ThreeReadsOneReverseComplimentReturnPathsForStran
     const auto end_kmer { "GTGCA" };
 
     LocalAssemblyGraph graph;
-    graph = LocalAssemblyGraph::create(new BankStrings(seqs), "-kmer-size %d -abundance-min 1 -verbose 0",
+    graph = LocalAssemblyGraph::create(new BankStrings(seqs), "-kmer-size %d -abundance-min 1 -verbose 0 -nb-cores 1",
                                        TEST_KMER_SIZE);
 
     Node start_node;
@@ -406,7 +420,8 @@ TEST(DepthFirstSearchFromTest, ThreeReadsOneReverseComplimentReturnPathsForStran
 
     EXPECT_EQ(result.size(), 1);
     EXPECT_EQ(*result.begin(), expected_seq);
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 
 }
 
@@ -419,7 +434,7 @@ TEST(DepthFirstSearchFromTest, SimpleCycleReturnPathsOfLengthsUpToMaxPathLengthC
     const auto end_kmer { "TATAT" };
 
     LocalAssemblyGraph graph;
-    graph = LocalAssemblyGraph::create(new BankStrings(seqs), "-kmer-size %d -abundance-min 1 -verbose 0",
+    graph = LocalAssemblyGraph::create(new BankStrings(seqs), "-kmer-size %d -abundance-min 1 -verbose 0 -nb-cores 1",
                                        TEST_KMER_SIZE);
 
     Node start_node;
@@ -439,7 +454,8 @@ TEST(DepthFirstSearchFromTest, SimpleCycleReturnPathsOfLengthsUpToMaxPathLengthC
     }
 
     EXPECT_TRUE(is_in);
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 }
 
 
@@ -507,7 +523,7 @@ TEST(GraphCleaningTest, simpleTipRemove) {
             "TGTCATCTAGTTCAACAACCAAAAAAA", //>that's the tip
             "TGTCATCTAGTTCAACAACCGTTATGCCGTCCGACTCTTGCGCTCGGATGTCCGCAATGGGTTATCCCTATGTTCCGGTAATCTCTCATCTACTAAGCGCCCTAAAGGTCGTATGGTTGGAGGGCGGTTACACACCCTTAAGTACCGAACGATAGAGCACCCGTCTAGGAGGGCGTGCAGGGTCTCCCGCTAGCTAATGGTCACGGCCTCTCTGGGAAAGCTGAACAACGGATGATACCCATACTGCCACTCCAGTACCTGGGCCGCGTGTTGTACGCTGTGTATCTTGAGAGCGTTTCCAGCAGATAGAACAGGATCACATGTACATG" //>remaining part
     };
-    Graph graph = Graph::create(new BankStrings(sequences), "-kmer-size %d -abundance-min 1 -verbose 0", kmer_size);
+    Graph graph = Graph::create(new BankStrings(sequences), "-kmer-size %d -abundance-min 1 -verbose 0 -nb-cores 1", kmer_size);
     clean(graph);
 
     unsigned int num_non_deleted_nodes { 0 };
@@ -524,7 +540,8 @@ TEST(GraphCleaningTest, simpleTipRemove) {
 
     EXPECT_EQ(num_nodes, 624);
     EXPECT_EQ(num_non_deleted_nodes, 617);
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 
 }
 
@@ -686,38 +703,41 @@ TEST(GenerateEndKmersTest, GenerateNoKmersReturnEmptySet) {
 
 
 TEST(QueryAbundance, oneKmer_ReturnOne) {
-    Graph graph = Graph::create(new BankStrings("AATGT", NULL), "-kmer-size 5 -abundance-min 1 -verbose 0");
+    Graph graph = Graph::create(new BankStrings("AATGT", NULL), "-kmer-size 5 -abundance-min 1 -verbose 0 -nb-cores 1");
     auto kmer = "AATGT";
     auto node { graph.buildNode(kmer) };
     const auto covg { graph.queryAbundance(node) };
 
     // We get the neighbors of this real node and make sure it has the neighbours we expect
     EXPECT_EQ(covg, 1);
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 }
 
 
 TEST(QueryAbundance, twoKmers_ReturnTwo) {
-    Graph graph = Graph::create(new BankStrings("AATGTAATGT", NULL), "-kmer-size 5 -abundance-min 1 -verbose 0");
+    Graph graph = Graph::create(new BankStrings("AATGTAATGT", NULL), "-kmer-size 5 -abundance-min 1 -verbose 0 -nb-cores 1");
     auto kmer = "AATGT";
     auto node { graph.buildNode(kmer) };
     const auto covg { graph.queryAbundance(node) };
 
     // We get the neighbors of this real node and make sure it has the neighbours we expect
     EXPECT_EQ(covg, 2);
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 }
 
 
 TEST(QueryAbundance, fakeKmer_ReturnZero) {
-    Graph graph = Graph::create(new BankStrings("AATGT", NULL), "-kmer-size 5 -abundance-min 1 -verbose 0");
+    Graph graph = Graph::create(new BankStrings("AATGT", NULL), "-kmer-size 5 -abundance-min 1 -verbose 0 -nb-cores 1");
     auto kmer = "CCCCC";
     auto node { graph.buildNode(kmer) };
     const auto covg { graph.queryAbundance(node) };
 
     // We get the neighbors of this real node and make sure it has the neighbours we expect
     EXPECT_EQ(covg, 0);
-    remove_graph_file();
+    fs::path gatb_graph_filepath("dummy");
+    remove_graph_file(gatb_graph_filepath);
 }
 
 

@@ -157,8 +157,9 @@ void LocalAssemblyGraph::build_paths_between(const std::string &start_kmer, cons
 }
 
 
-void remove_graph_file() {
-    const fs::path p { "dummy.h5" };
+void remove_graph_file(const fs::path &gatb_graph_filepath) {
+    const fs::path p { gatb_graph_filepath.string() + ".h5" };
+    std::cout << "Removing " << p.string() << std::endl; // TODO: put the graphs in a proper folder
     fs::remove(p);
 }
 

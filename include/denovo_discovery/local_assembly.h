@@ -53,7 +53,7 @@ bool string_ends_with(std::string const &query, std::string const &ending);
 
 std::string reverse_complement(const std::string &forward);
 
-void remove_graph_file();
+void remove_graph_file(const fs::path &gatb_graph_filepath);
 
 std::vector<std::string> generate_start_kmers(const std::string &sequence, const uint16_t &k, uint32_t num_to_generate);
 
