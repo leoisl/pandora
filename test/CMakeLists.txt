@@ -24,7 +24,10 @@ target_link_libraries(pandora_test
         ${Boost_THREAD_LIBRARY}
         ${EXTERNAL_LIBS}
         ${CMAKE_DL_LIBS}
-        ${ZLIB_LIBRARY})
+        ${ZLIB_LIBRARY}
+        ${LIBRT}
+        -static-libgcc -static-libstdc++
+        )
 
 target_include_directories(pandora_test PUBLIC
         ${PROJECT_SOURCE_DIR}/include

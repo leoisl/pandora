@@ -62,6 +62,9 @@ log.txt
 # and files for debugging and sending to other people
 EcoliK12_pandora*
 
+#portable binary build dir
+build_portable_executable
+
 # local directory - michael
 vm-build/
 

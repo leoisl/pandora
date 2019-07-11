@@ -9,6 +9,11 @@ set(CMAKE_CXX_FLAGS_RELEASE_WITH_ASSERTS "-O3")
 find_package(Threads REQUIRED)
 find_package(ZLIB REQUIRED)
 
+find_library(LIBRT rt)
+if(NOT LIBRT)
+    message(FATAL_ERROR "rt library not found")
+endif()
+
 set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost 1.62.0 COMPONENTS system filesystem iostreams log thread date_time REQUIRED)
 
@@ -71,7 +76,9 @@ target_link_libraries(${PROJECT_NAME}
         ${Boost_THREAD_LIBRARY}
         ${EXTERNAL_LIBS}
         ${CMAKE_DL_LIBS}
-        ${ZLIB_LIBRARY})
+        ${ZLIB_LIBRARY}
+        ${LIBRT}
+        -static-libgcc -static-libstdc++)
 
 
 
@@ -91,7 +98,9 @@ if(BUILD_COMPARE_INDEXES)
             ${Boost_THREAD_LIBRARY}
             ${EXTERNAL_LIBS}
             ${CMAKE_DL_LIBS}
-            ${ZLIB_LIBRARY})
+            ${ZLIB_LIBRARY}
+            ${LIBRT}
+            -static-libgcc -static-libstdc++)
 endif(BUILD_COMPARE_INDEXES)
 
 
