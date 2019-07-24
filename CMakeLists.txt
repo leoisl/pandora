@@ -77,8 +77,7 @@ target_link_libraries(${PROJECT_NAME}
         ${EXTERNAL_LIBS}
         ${CMAKE_DL_LIBS}
         ${ZLIB_LIBRARY}
-        ${LIBRT}
-        -static-libgcc -static-libstdc++)
+        ${LIBRT})
 
 
 
@@ -99,8 +98,7 @@ if(BUILD_COMPARE_INDEXES)
             ${EXTERNAL_LIBS}
             ${CMAKE_DL_LIBS}
             ${ZLIB_LIBRARY}
-            ${LIBRT}
-            -static-libgcc -static-libstdc++)
+            ${LIBRT})
 endif(BUILD_COMPARE_INDEXES)
 
 

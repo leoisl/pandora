@@ -28,11 +28,16 @@ cd io
 mkdir build_portable_executable
 cd build_portable_executable
 cmake -DCMAKE_BUILD_TYPE=RELEASE_WITH_ASSERTS ..
-make -j 8
+make VERBOSE=1 -j 8
 ctest -VV
 
 # verify if the binary is portable
-# libcheck pandora
+set +e
+libcheck pandora #TODO: libomp is still a shared library dependency
+set -e
+
+# print ldd output for us to check the dependencies also
+ldd pandora
 
 # copy binary to host filesystem
 cp pandora /io/pandora-linux-precompiled

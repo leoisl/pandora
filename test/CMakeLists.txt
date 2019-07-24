@@ -25,9 +25,7 @@ target_link_libraries(pandora_test
         ${EXTERNAL_LIBS}
         ${CMAKE_DL_LIBS}
         ${ZLIB_LIBRARY}
-        ${LIBRT}
-        -static-libgcc -static-libstdc++
-        )
+        ${LIBRT})
 
 target_include_directories(pandora_test PUBLIC
         ${PROJECT_SOURCE_DIR}/include
