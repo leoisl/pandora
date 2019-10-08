@@ -330,7 +330,7 @@ void pangenome::Graph::add_hits_to_kmergraphs(const std::vector<std::shared_ptr<
 
         BOOST_LOG_TRIVIAL(debug) << "Added " << num_hits[1] << " hits in the forward direction and "
                                  << num_hits[0]
-                                 << " hits in the reverse";
+                                 << " hits in the reverse to locus " << pangraph_node.name;
         pangraph_node.kmer_prg_with_coverage.set_num_reads(pangraph_node.covg);
     }
 }
