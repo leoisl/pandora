@@ -250,14 +250,14 @@ uint32_t estimate_parameters(std::shared_ptr<pangenome::Graph> pangraph,
     // evaluate error rate
     auto mean = fit_mean_covg(kmer_covg_dist, covg / 10);
     auto var = fit_variance_covg(kmer_covg_dist, mean, covg / 10);
-    std::cout << "mean, var: " << mean << " " << var << std::endl;
+    BOOST_LOG_TRIVIAL(debug) << "[Evaluating error rate] mean, var: " << mean << " " << var << std::endl;
     if (mean > var) {
         auto zero_thresh = 2;
         mean = fit_mean_covg(kmer_covg_dist, zero_thresh);
         var = fit_variance_covg(kmer_covg_dist, mean, zero_thresh);
-        std::cout << "new mean, var: " << mean << " " << var << std::endl;
+        BOOST_LOG_TRIVIAL(debug) << "[Evaluating error rate] new mean, var: " << mean << " " << var << std::endl;
     }
-    std::cout << bin << " " << num_reads << " " << covg << std::endl;
+    BOOST_LOG_TRIVIAL(debug) << "[Evaluating error rate] " << bin << " " << num_reads << " " << covg << std::endl;
     if ((bin and num_reads > 30 and covg > 30)
         or (not bin and abs(var - mean) < 2 and mean > 10 and num_reads > 30
             and covg > 2)) {
