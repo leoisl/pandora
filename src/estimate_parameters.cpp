@@ -26,7 +26,7 @@ double fit_mean_covg(
     if (total == 0)
         return 0;
 
-    BOOST_LOG_TRIVIAL(debug) << "Found mean " << sum / total;
+    BOOST_LOG_TRIVIAL(info) << "Found mean " << sum / total;
     return sum / total;
 }
 
@@ -43,7 +43,7 @@ double fit_variance_covg(const std::vector<uint32_t>& kmer_covg_dist, double& me
     if (total == 0)
         return 0;
 
-    BOOST_LOG_TRIVIAL(debug) << "Found variance " << acc / total;
+    BOOST_LOG_TRIVIAL(info) << "Found variance " << acc / total;
     return acc / total;
 }
 
@@ -53,7 +53,7 @@ void fit_negative_binomial(double& mean, double& variance, float& p, float& r)
     assert(mean < variance);
     p = mean / variance;
     r = (mean * p / (1 - p) + variance * p * p / (1 - p)) / 2;
-    BOOST_LOG_TRIVIAL(debug) << "Negative binomial parameters p: " << p
+    BOOST_LOG_TRIVIAL(info) << "Negative binomial parameters p: " << p
                              << " and r: " << r;
 }
 
@@ -93,7 +93,7 @@ uint32_t find_mean_covg(std::vector<uint32_t>& kmer_covg_dist)
 
     // if still have first_peak true, was a mistake to try with this covg
     if (first_peak) {
-        BOOST_LOG_TRIVIAL(debug)
+        BOOST_LOG_TRIVIAL(info)
             << "Did not find 2 distinct peaks - use default error rate";
         max_covg = 0;
     }
@@ -122,7 +122,7 @@ int find_prob_thresh(std::vector<uint32_t>& kmer_prob_dist)
         peak = (int)distance(kmer_prob_dist.begin(),
             max_element(kmer_prob_dist.begin() + 1 + first_peak,
                 kmer_prob_dist.begin() + second_peak));
-        BOOST_LOG_TRIVIAL(debug)
+        BOOST_LOG_TRIVIAL(info)
             << "Found new peak between " << first_peak - 200 << " and "
             << second_peak - 200 << " at " << peak - 200;
         if (peak > (int)kmer_prob_dist.size() - 15) {
@@ -143,7 +143,7 @@ int find_prob_thresh(std::vector<uint32_t>& kmer_prob_dist)
             peak = (int)distance(kmer_prob_dist.begin(),
                 max_element(kmer_prob_dist.begin() + 1 + first_peak,
                     kmer_prob_dist.begin() + second_peak));
-            BOOST_LOG_TRIVIAL(debug)
+            BOOST_LOG_TRIVIAL(info)
                 << "Found new peak between " << first_peak - 200 << " and "
                 << second_peak - 200 << " at " << peak - 200;
             if (peak > (int)kmer_prob_dist.size() - 6 and second_peak != peak) {
@@ -164,20 +164,20 @@ int find_prob_thresh(std::vector<uint32_t>& kmer_prob_dist)
                     peak = i;
                 }
             }
-            BOOST_LOG_TRIVIAL(debug)
+            BOOST_LOG_TRIVIAL(info)
                 << "Found a single peak. Chose a minimal non-zero threshold";
             return peak - 200;
         } else {
-            BOOST_LOG_TRIVIAL(debug) << "Found a 2 peaks with low -log p values (>-15)";
+            BOOST_LOG_TRIVIAL(info) << "Found a 2 peaks with low -log p values (>-15)";
         }
     } else {
-        BOOST_LOG_TRIVIAL(debug) << "Found a 2 peaks";
+        BOOST_LOG_TRIVIAL(info) << "Found a 2 peaks";
     }
 
     peak = (int)distance(kmer_prob_dist.begin(),
         min_element(
             kmer_prob_dist.begin() + first_peak, kmer_prob_dist.begin() + second_peak));
-    BOOST_LOG_TRIVIAL(debug) << "Minimum found between " << first_peak - 200 << " and "
+    BOOST_LOG_TRIVIAL(info) << "Minimum found between " << first_peak - 200 << " and "
                              << second_peak - 200 << " at " << peak - 200;
 
     /*int thresh = kmer_prob_dist.size()-1;
@@ -197,10 +197,20 @@ uint32_t estimate_parameters(std::shared_ptr<pangenome::Graph> pangraph,
     const std::string& outdir, const uint32_t k, float& e_rate, const uint32_t covg,
     bool& bin, const uint32_t& sample_id)
 {
+    BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Start";
+    BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] k: " << k;
+    BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] error rate: " << e_rate;
+    BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Global coverage: " << covg;
+    BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Binomial? " << bin;
+    BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] sample_id: " << bin;
+
+
     uint32_t exp_depth_covg = covg;
 
     // ignore trivial case
     if (pangraph->nodes.empty()) {
+        BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Trivial case, expected coverage: " << exp_depth_covg;
+        BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] End";
         return exp_depth_covg;
     }
 
@@ -216,7 +226,6 @@ uint32_t estimate_parameters(std::shared_ptr<pangenome::Graph> pangraph,
     float negative_binomial_parameter_p = 0, negative_binomial_parameter_r = 0;
 
     // first we estimate error rate
-    BOOST_LOG_TRIVIAL(info) << "Collect kmer coverage distribution";
     for (const auto& node : pangraph->nodes) {
         num_reads += node.second->covg;
         for (uint32_t i = 1;
@@ -233,10 +242,9 @@ uint32_t estimate_parameters(std::shared_ptr<pangenome::Graph> pangraph,
 
     // estimate actual coverage on these prgs
     num_reads = num_reads / pangraph->nodes.size();
+    BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Coverage on PRGs: " << num_reads;
 
     // save coverage distribution
-    BOOST_LOG_TRIVIAL(info) << "Writing kmer coverage distribution to " << outdir
-                            << "/kmer_covgs.txt";
     fs::create_directories(outdir);
     std::ofstream handle;
     handle.open(outdir + "/kmer_covgs.txt");
@@ -249,43 +257,57 @@ uint32_t estimate_parameters(std::shared_ptr<pangenome::Graph> pangraph,
 
     // evaluate error rate
     auto mean = fit_mean_covg(kmer_covg_dist, covg / 10);
+    BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Kmer coverage mean: " << mean;
+
     auto var = fit_variance_covg(kmer_covg_dist, mean, covg / 10);
-    BOOST_LOG_TRIVIAL(debug) << "[Evaluating error rate] mean, var: " << mean << " " << var << std::endl;
+    BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Kmer coverage variance: " << var;
+
     if (mean > var) {
+        BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Mean > var, reestimating...";
+
         auto zero_thresh = 2;
         mean = fit_mean_covg(kmer_covg_dist, zero_thresh);
+        BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Reestimated kmer coverage mean: " << mean;
+
         var = fit_variance_covg(kmer_covg_dist, mean, zero_thresh);
-        BOOST_LOG_TRIVIAL(debug) << "[Evaluating error rate] new mean, var: " << mean << " " << var << std::endl;
+        BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Reestimated kmer coverage variance: " << var;
     }
-    BOOST_LOG_TRIVIAL(debug) << "[Evaluating error rate] " << bin << " " << num_reads << " " << covg << std::endl;
+
     if ((bin and num_reads > 30 and covg > 30)
         or (not bin and abs(var - mean) < 2 and mean > 10 and num_reads > 30
             and covg > 2)) {
+        BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Fitting binomial... ";
         bin = true;
         mean_covg = find_mean_covg(kmer_covg_dist);
+        BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Fitting binomial: Mean kmer coverage: " << mean_covg;
+
         if (exp_depth_covg < 1)
             exp_depth_covg = mean;
-        BOOST_LOG_TRIVIAL(info)
-            << "found mean kmer covg " << mean_covg << " and mean global covg " << covg
-            << " with avg num reads covering node " << num_reads;
+        BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Fitting binomial: Expected coverage: " << exp_depth_covg;
+
+        auto old_e_rate = e_rate;
         if (mean_covg > 0 and mean_covg < covg) {
-            auto old_e_rate = e_rate;
             e_rate = -log((float)mean_covg / covg) / k;
-            BOOST_LOG_TRIVIAL(info) << "Estimated error rate updated from "
-                                    << old_e_rate << " to " << e_rate;
         }
+        BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Fitting binomial: Estimated error rate updated from " << old_e_rate << " to " << e_rate;
+
+
     } else if (not bin and num_reads > 30 and covg > 2 and mean < var) {
+        BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Fitting negative binomial... ";
         fit_negative_binomial(
             mean, var, negative_binomial_parameter_p, negative_binomial_parameter_r);
         exp_depth_covg = mean;
+        BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Fitting negative binomial: Negative binomial parameter p: " << negative_binomial_parameter_p;
+        BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Fitting negative binomial: Negative binomial parameter r: " << negative_binomial_parameter_r;
+        BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Fitting negative binomial: Expected coverage: " << exp_depth_covg;
     } else {
-        BOOST_LOG_TRIVIAL(info) << "Insufficient coverage to update error rate";
+        BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Insufficient coverage to update error rate";
         exp_depth_covg = fit_mean_covg(kmer_covg_dist, covg / 10);
         exp_depth_covg = std::max(exp_depth_covg, (uint)1);
+        BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Insufficient coverage to update error rate: Expected coverage: " << exp_depth_covg;
     }
 
     // find probability threshold
-    BOOST_LOG_TRIVIAL(info) << "Collect kmer probability distribution";
     for (const auto& node : pangraph->nodes) {
         node.second->kmer_prg_with_coverage.set_exp_depth_covg(exp_depth_covg);
         if (bin)
@@ -315,8 +337,6 @@ uint32_t estimate_parameters(std::shared_ptr<pangenome::Graph> pangraph,
     }
 
     // save probability distribution
-    BOOST_LOG_TRIVIAL(info) << "Writing kmer probability distribution to " << outdir
-                            << "/kmer_probs.txt";
     handle.open(outdir + "/kmer_probs.txt");
     assert(!handle.fail()
         or assert_msg("Could not open file " << outdir + "/kmer_probs.txt"));
@@ -335,12 +355,12 @@ uint32_t estimate_parameters(std::shared_ptr<pangenome::Graph> pangraph,
     // if there are enough remaining kmers, estimate thresh, otherwise use a default
     if (std::accumulate(it, kmer_prob_dist.end(), (uint32_t)0) > 1000) {
         thresh = find_prob_thresh(kmer_prob_dist);
-        BOOST_LOG_TRIVIAL(info) << "Estimated threshold for true kmers is " << thresh;
+        BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Estimated threshold for true kmers: " << thresh;
     } else {
         thresh = (int)std::distance(kmer_prob_dist.begin(), it) - 200;
         BOOST_LOG_TRIVIAL(info)
-            << "Did not find enough non-zero coverage kmers to estimated threshold for "
-               "true kmers. Use the naive threshold "
+            << "[Estimate Parameters] Did not find enough non-zero coverage kmers to estimated threshold for "
+               "true kmers. Using the naive threshold: "
             << thresh;
     }
 
@@ -348,5 +368,8 @@ uint32_t estimate_parameters(std::shared_ptr<pangenome::Graph> pangraph,
     for (auto& node : pangraph->nodes) {
         node.second->kmer_prg_with_coverage.set_thresh(thresh);
     }
+
+    BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] Expected coverage: " << exp_depth_covg;
+    BOOST_LOG_TRIVIAL(info) << "[Estimate Parameters] End";
     return exp_depth_covg;
 }
