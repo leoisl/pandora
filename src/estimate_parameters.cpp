@@ -176,7 +176,7 @@ int find_prob_thresh(std::vector<uint32_t>& kmer_prob_dist)
 
     peak = (int)distance(kmer_prob_dist.begin(),
         min_element(
-            kmer_prob_dist.begin() + first_peak, kmer_prob_dist.begin() + second_peak));
+            kmer_prob_dist.begin() + first_peak + 2, kmer_prob_dist.begin() + second_peak));
     BOOST_LOG_TRIVIAL(info) << "Minimum found between " << first_peak - 200 << " and "
                              << second_peak - 200 << " at " << peak - 200;
 
