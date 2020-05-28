@@ -88,8 +88,8 @@ void KmerGraphWithCoverage::set_negative_binomial_parameters(
             "nb_p " << negative_binomial_parameter_p << " was not set in kmergraph"));
     assert(negative_binomial_parameter_r > 0
         || assert_msg("nb_r was not set in kmergraph"));
-    negative_binomial_parameter_p += nbin_prob;
-    negative_binomial_parameter_r += nb_fail;
+    negative_binomial_parameter_p = nbin_prob;
+    negative_binomial_parameter_r = nb_fail;
 
     BOOST_LOG_TRIVIAL(info) << "For KmerGraph " << kmer_prg << ", negative_binomial_parameter_p set to " << negative_binomial_parameter_p;
     BOOST_LOG_TRIVIAL(info) << "For KmerGraph " << kmer_prg << ", negative_binomial_parameter_r set to " << negative_binomial_parameter_r;
