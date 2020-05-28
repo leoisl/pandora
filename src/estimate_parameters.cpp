@@ -114,83 +114,44 @@ int find_prob_thresh(std::vector<uint32_t>& kmer_prob_dist)
         return 0;
     }
 
-    int second_peak = (int)kmer_prob_dist.size() - 1;
-    int first_peak = 0;
-    int peak;
-    while ((first_peak == (int)0 or second_peak == (int)kmer_prob_dist.size() - 1)
-        and first_peak + 1 < second_peak) {
-        peak = (int)distance(kmer_prob_dist.begin(),
-            max_element(kmer_prob_dist.begin() + 1 + first_peak,
-                kmer_prob_dist.begin() + second_peak));
-        BOOST_LOG_TRIVIAL(info)
-            << "Found new peak between " << first_peak - 200 << " and "
-            << second_peak - 200 << " at " << peak - 200;
-        if (peak > (int)kmer_prob_dist.size() - 15) {
-            second_peak = peak;
-        } else {
-            first_peak = peak;
+    std::vector<uint32_t> kmer_prob_dist_temp = kmer_prob_dist; //makes a copy so that we can manipulate it
+
+    // first find the first peak
+    int first_peak = (int) distance(kmer_prob_dist_temp.begin(),
+        max_element(kmer_prob_dist_temp.begin(), kmer_prob_dist_temp.end()));
+
+    // then remove the first peak and values surrounding it, to not get any close value
+    int surrounding_length = 3;
+    for (int i=first_peak-surrounding_length; i<=first_peak+surrounding_length; ++i) {
+        if (i>=0 and i<kmer_prob_dist_temp.size()) {
+            kmer_prob_dist_temp[i] = 0;
         }
     }
 
-    // if first_peak == second_peak, probably wrongly set threshold for where first peak
-    // ends
-    if (first_peak == second_peak or first_peak + 1 == second_peak) {
-        // first try with lower thresold for where first peak is
-        first_peak = 0;
-        second_peak = (int)kmer_prob_dist.size() - 1;
-        while ((first_peak == (int)0 or second_peak == (int)kmer_prob_dist.size() - 1)
-            and first_peak + 1 < second_peak) {
-            peak = (int)distance(kmer_prob_dist.begin(),
-                max_element(kmer_prob_dist.begin() + 1 + first_peak,
-                    kmer_prob_dist.begin() + second_peak));
-            BOOST_LOG_TRIVIAL(info)
-                << "Found new peak between " << first_peak - 200 << " and "
-                << second_peak - 200 << " at " << peak - 200;
-            if (peak > (int)kmer_prob_dist.size() - 6 and second_peak != peak) {
-                second_peak = peak;
-            } else {
-                first_peak = peak;
-            }
-        }
+    // find second peak
+    int second_peak = (int) distance(kmer_prob_dist_temp.begin(),
+                                    max_element(
+                                        kmer_prob_dist_temp.begin(), kmer_prob_dist_temp.end()));
 
-        // secondly, find single peak and pick a min value closer to 0
-        if (first_peak == second_peak or first_peak + 1 == second_peak) {
-            peak = (int)distance(kmer_prob_dist.begin(),
-                max_element(kmer_prob_dist.begin(), kmer_prob_dist.end()));
-            for (uint32_t i = (uint32_t)peak; i != kmer_prob_dist.size(); ++i) {
-                if (kmer_prob_dist[i] > 0
-                    and (kmer_prob_dist[i] < kmer_prob_dist[peak]
-                        or kmer_prob_dist[peak] == 0)) {
-                    peak = i;
-                }
-            }
-            BOOST_LOG_TRIVIAL(info)
-                << "Found a single peak. Chose a minimal non-zero threshold";
-            return peak - 200;
-        } else {
-            BOOST_LOG_TRIVIAL(info) << "Found a 2 peaks with low -log p values (>-15)";
-        }
-    } else {
-        BOOST_LOG_TRIVIAL(info) << "Found a 2 peaks";
+    // ensure first peak < second peak
+    if (first_peak > second_peak) {
+        // swap
+        int temp_peak = first_peak;
+        first_peak = second_peak;
+        second_peak = temp_peak;
     }
 
-    peak = (int)distance(kmer_prob_dist.begin(),
-        min_element(
-            kmer_prob_dist.begin() + first_peak + 2, kmer_prob_dist.begin() + second_peak));
-    BOOST_LOG_TRIVIAL(info) << "Minimum found between " << first_peak - 200 << " and "
-                             << second_peak - 200 << " at " << peak - 200;
+    // peak offset to skip the artificial minimum
+    int peak_offset = 2;
 
-    /*int thresh = kmer_prob_dist.size()-1;
-    for (uint i=kmer_prob_dist.size()-1; i!=0; --i)
-    {
-        if (kmer_prob_dist[i] > 0 and (kmer_prob_dist[i] < kmer_prob_dist[thresh]) or
-    (kmer_prob_dist[thresh] == 0))
-        {
-            thresh = i;
-        }
-    }*/
+    int minimum_peak_between_the_two_highest_peaks =
+        (int)distance(kmer_prob_dist.begin(),
+            min_element(kmer_prob_dist.begin() + first_peak + peak_offset, kmer_prob_dist.begin() + second_peak));
 
-    return peak - 200;
+
+    BOOST_LOG_TRIVIAL(info) << "Minimum found between " << (first_peak - 200) << " and "
+                             << (second_peak - 200) << " at " << (minimum_peak_between_the_two_highest_peaks - 200);
+    return minimum_peak_between_the_two_highest_peaks - 200;
 }
 
 uint32_t estimate_parameters(std::shared_ptr<pangenome::Graph> pangraph,
