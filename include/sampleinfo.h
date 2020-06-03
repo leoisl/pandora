@@ -274,14 +274,17 @@ protected:
     uint32_t exp_depth_covg_for_this_sample;
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // A VCF record can have several genotypings in pandora
-    // The first comes by comparing the maximum likelihood multisample path vs a maximum
-    // likelihood singlesample path The second is the genotyping based on coverage This
-    // second genotyping can be not compatible, so then we make it compatible, having
-    // thus the third genotyping See
-    // https://github.com/iqbal-lab/pandora1_paper/issues/105#issuecomment-547121546 for
-    // details
+    // clang-format off
+    /**
+     * A VCF record can have several genotypings in pandora.
+     * The first comes by comparing the maximum likelihood multi-sample path vs a maximum likelihood single-sample path.
+     * The second is the genotyping based on coverage.
+     * This second genotyping may be not compatible, so then we make it compatible, having thus the third genotyping.
+     * See https://github.com/iqbal-lab/pandora1_paper/issues/105#issuecomment-547121546 for details.
+     */
+    // clang-format on
     boost::optional<uint32_t> GT_from_maximum_likelihood_path;
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
