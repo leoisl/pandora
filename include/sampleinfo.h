@@ -89,6 +89,7 @@ public:
         return allele_to_reverse_coverages;
     }
 
+    // local choice genotyping (see genotype_from_coverage_using_maximum_likelihood_path_as_reference())
     virtual void genotype_from_coverage();
 
     // clang-format off
@@ -253,6 +254,7 @@ public:
     using IndexAndConfidenceAndMaxLikelihood = std::tuple<size_t, double, double>;
     virtual boost::optional<IndexAndConfidenceAndMaxLikelihood> get_confidence() const;
     virtual std::string get_confidence_to_string() const;
+    virtual std::string get_confidence_percentile_to_string() const;
 
     using GenotypeAndMaxLikelihood = std::pair<uint32_t, double>;
     virtual boost::optional<GenotypeAndMaxLikelihood>
