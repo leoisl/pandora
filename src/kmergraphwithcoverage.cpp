@@ -31,7 +31,7 @@ void KmerGraphWithCoverage::set_binomial_parameter_p(const float e_rate)
     assert(kmer_prg->k != 0);
     assert(0 < e_rate and e_rate < 1);
     binomial_parameter_p = 1 / exp(e_rate * kmer_prg->k);
-    BOOST_LOG_TRIVIAL(info) << "For KmerGraph " << kmer_prg << ", binomial_parameter_p set to " << binomial_parameter_p;
+    BOOST_LOG_TRIVIAL(debug) << "For KmerGraph " << kmer_prg << ", binomial_parameter_p set to " << binomial_parameter_p;
 }
 
 void KmerGraphWithCoverage::increment_covg(
@@ -91,8 +91,8 @@ void KmerGraphWithCoverage::set_negative_binomial_parameters(
     negative_binomial_parameter_p = nbin_prob;
     negative_binomial_parameter_r = nb_fail;
 
-    BOOST_LOG_TRIVIAL(info) << "For KmerGraph " << kmer_prg << ", negative_binomial_parameter_p set to " << negative_binomial_parameter_p;
-    BOOST_LOG_TRIVIAL(info) << "For KmerGraph " << kmer_prg << ", negative_binomial_parameter_r set to " << negative_binomial_parameter_r;
+    BOOST_LOG_TRIVIAL(debug) << "For KmerGraph " << kmer_prg << ", negative_binomial_parameter_p set to " << negative_binomial_parameter_p;
+    BOOST_LOG_TRIVIAL(debug) << "For KmerGraph " << kmer_prg << ", negative_binomial_parameter_r set to " << negative_binomial_parameter_r;
 }
 
 float KmerGraphWithCoverage::nbin_prob(uint32_t node_id, const uint32_t& sample_id)
