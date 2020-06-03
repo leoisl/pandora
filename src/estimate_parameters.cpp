@@ -202,7 +202,7 @@ uint32_t estimate_parameters(std::shared_ptr<pangenome::Graph> pangraph,
     BOOST_LOG_TRIVIAL(debug) << "[Estimate Parameters] error rate: " << e_rate;
     BOOST_LOG_TRIVIAL(debug) << "[Estimate Parameters] Global coverage: " << covg;
     BOOST_LOG_TRIVIAL(debug) << "[Estimate Parameters] Binomial? " << bin;
-    BOOST_LOG_TRIVIAL(debug) << "[Estimate Parameters] sample_id: " << bin;
+    BOOST_LOG_TRIVIAL(debug) << "[Estimate Parameters] sample_id: " << sample_id;
 
 
     uint32_t exp_depth_covg = covg;
