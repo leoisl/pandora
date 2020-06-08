@@ -102,14 +102,16 @@ public:
     virtual std::string alts_to_string() const;
     virtual std::string get_format(
         bool genotyping_from_maximum_likelihood, bool genotyping_from_coverage) const;
-    virtual std::string sample_infos_to_string(
-        bool genotyping_from_maximum_likelihood, bool genotyping_from_coverage) const
+    virtual std::string sample_infos_to_string(bool genotyping_from_maximum_likelihood,
+        bool genotyping_from_coverage,
+        const GCPWrappers* const gcp_wrappers = nullptr) const
     {
-        return this->sampleIndex_to_sampleInfo.to_string(
-            genotyping_from_maximum_likelihood, genotyping_from_coverage);
+        return this->sampleIndex_to_sampleInfo.to_string(genotyping_from_maximum_likelihood,
+            genotyping_from_coverage, gcp_wrappers);
     }
-    virtual std::string to_string(
-        bool genotyping_from_maximum_likelihood, bool genotyping_from_coverage) const;
+    virtual std::string to_string(bool genotyping_from_maximum_likelihood,
+        bool genotyping_from_coverage,
+        const GCPWrappers* const gcp_wrappers = nullptr) const;
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

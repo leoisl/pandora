@@ -33,6 +33,7 @@
 #include "noise_filtering.h"
 #include "estimate_parameters.h"
 #include "OptionsAggregator.h"
+#include "GCPWrapper.h"
 
 using std::set;
 using std::vector;
@@ -396,6 +397,8 @@ int pandora_compare(int argc, char* argv[])
     for (const auto& sample_pair : samples)
         sample_names.push_back(sample_pair.first);
 
+    RNGModels rng_models;
+
     auto pangraph = std::make_shared<pangenome::Graph>(sample_names);
 
     // for each sample, run pandora to get the sample pangraph
@@ -430,9 +433,12 @@ int pandora_compare(int argc, char* argv[])
         pangraph_sample->add_hits_to_kmergraphs(prgs, 0);
 
         BOOST_LOG_TRIVIAL(info) << "Estimate parameters for kmer graph model";
-        auto exp_depth_covg = estimate_parameters(
+        uint32_t exp_depth_covg;
+        std::shared_ptr<RNGModel> rng_model;
+        std::tie(exp_depth_covg, rng_model) = estimate_parameters(
             pangraph_sample, sample_outdir, k, e_rate, covg, bin, 0);
         genotyping_options.add_exp_depth_covg(exp_depth_covg);
+        rng_models.push_back(rng_model);
 
         if (genotyping_options.get_min_kmer_covg() == 0)
             genotyping_options.set_min_kmer_covg(exp_depth_covg / 10);
@@ -477,6 +483,14 @@ int pandora_compare(int argc, char* argv[])
         // information This is important since this is the heaviest information to keep
         // in compare pangraph has just coverage information and the consensus path for
         // each sample and PRG
+    }
+
+    // transform the RNG models into GCPWrappers, if we are to genotype
+    std::shared_ptr<GCPWrappers> gcp_wrappers(nullptr);
+    if (do_global_genotyping or do_local_genotyping) {
+        BOOST_LOG_TRIVIAL(info) << "Simulating genotype confidences and building the Genotype Confidence Percentiler for each sample";
+        GCPSampleInfoModels sample_info_models(rng_models, &genotyping_options);
+        gcp_wrappers = std::make_shared<GCPWrappers>(sample_info_models);
     }
 
     // for each pannode in graph, find a best reference
@@ -582,7 +596,7 @@ int pandora_compare(int argc, char* argv[])
             // save the genotyped vcf to disk
             auto vcfGenotypedPath = VCFsGenotypedDirs + "/" + int_to_string(dir) + "/"
                 + prg_ptr->name + "_genotyped.vcf";
-            vcf.save(vcfGenotypedPath, false, true);
+            vcf.save(vcfGenotypedPath, false, true, gcp_wrappers.get());
 
 // add the genotyped vcf path to VCFGenotypedPathsToBeConcatenated to concatenate after
 #pragma omp critical(VCFGenotypedPathsToBeConcatenated)

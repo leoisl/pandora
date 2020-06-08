@@ -53,6 +53,7 @@ include(${PROJECT_SOURCE_DIR}/ext/gtest.cmake)
 include_directories(SYSTEM
         ${CMAKE_BINARY_DIR}/include
         ${PROJECT_SOURCE_DIR}/cgranges/cpp
+        ${PROJECT_SOURCE_DIR}/GCP/src
         )
 
 #normal includes: warnings will be reported for these

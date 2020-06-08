@@ -80,6 +80,11 @@ public:
     uint32_t get_covg(uint32_t node_id, bool is_forward, uint32_t sample_id) const;
     uint32_t get_num_reads() const { return num_reads; }
     uint32_t get_total_number_samples() const { return total_number_samples; }
+    float get_binomial_parameter_p () const { return binomial_parameter_p; }
+    float get_negative_binomial_parameter_p () const { return negative_binomial_parameter_p; }
+    float get_negative_binomial_parameter_r () const {return negative_binomial_parameter_r; }
+
+
 
     // setters
     void increment_covg(uint32_t node_id, bool is_forward, uint32_t sample_id);

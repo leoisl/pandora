@@ -10,6 +10,12 @@
 #include "Maths.h"
 #include "OptionsAggregator.h"
 #include <boost/bind.hpp>
+#include "GCPWrapper.h"
+
+
+// forward declarations
+class GCPWrapper;
+class GCPWrappers;
 
 // TODO: use memoization to speed up everything here
 // TODO: this class is doing too much. There is the concept of an allele info which can
@@ -254,7 +260,7 @@ public:
     using IndexAndConfidenceAndMaxLikelihood = std::tuple<size_t, double, double>;
     virtual boost::optional<IndexAndConfidenceAndMaxLikelihood> get_confidence() const;
     virtual std::string get_confidence_to_string() const;
-    virtual std::string get_confidence_percentile_to_string() const;
+    virtual std::string get_confidence_percentile_to_string(const GCPWrapper* const gcp_wrapper = nullptr) const;
 
     using GenotypeAndMaxLikelihood = std::pair<uint32_t, double>;
     virtual boost::optional<GenotypeAndMaxLikelihood>
@@ -264,7 +270,8 @@ public:
     virtual void solve_incompatible_gt_conflict_with(SampleInfo& other);
 
     virtual std::string to_string(bool genotyping_from_maximum_likelihood,
-        bool genotyping_from_compatible_coverage) const;
+        bool genotyping_from_compatible_coverage,
+        const GCPWrapper* const gcp_wrapper = nullptr) const;
 
 protected:
     uint32_t sample_index;
@@ -379,16 +386,22 @@ public:
         return sample_index_to_sample_info_container[index];
     }
 
-    virtual std::string to_string(
-        bool genotyping_from_maximum_likelihood, bool genotyping_from_coverage) const
+    virtual std::string to_string(bool genotyping_from_maximum_likelihood,
+        bool genotyping_from_coverage,
+        const GCPWrappers* const gcp_wrappers = nullptr) const
     {
         std::stringstream out;
 
         for (uint32_t sample_info_index = 0; sample_info_index < this->size();
              ++sample_info_index) {
             const SAMPLE_TYPE& sample_info = (*this)[sample_info_index];
-            out << sample_info.to_string(
-                genotyping_from_maximum_likelihood, genotyping_from_coverage);
+            const GCPWrapper* gcp_wrapper_for_this_sample = nullptr;
+            if (gcp_wrappers != nullptr) {
+                gcp_wrapper_for_this_sample = &(gcp_wrappers->at(sample_info_index));
+            }
+
+            out << sample_info.to_string(genotyping_from_maximum_likelihood,
+                genotyping_from_coverage, gcp_wrapper_for_this_sample);
 
             bool is_the_last_sample_info = sample_info_index == this->size() - 1;
             if (not is_the_last_sample_info)

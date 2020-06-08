@@ -164,8 +164,9 @@ bool VCFRecord::operator<(const VCFRecord& y) const
     return false;
 }
 
-std::string VCFRecord::to_string(
-    bool genotyping_from_maximum_likelihood, bool genotyping_from_coverage) const
+std::string VCFRecord::to_string(bool genotyping_from_maximum_likelihood,
+    bool genotyping_from_coverage,
+    const GCPWrappers* const gcp_wrappers) const
 {
     std::stringstream out;
 
@@ -175,8 +176,8 @@ std::string VCFRecord::to_string(
         << this->get_format(
                genotyping_from_maximum_likelihood, genotyping_from_coverage)
         << "\t"
-        << this->sample_infos_to_string(
-               genotyping_from_maximum_likelihood, genotyping_from_coverage);
+        << this->sample_infos_to_string(genotyping_from_maximum_likelihood,
+               genotyping_from_coverage, gcp_wrappers);
 
     return out.str();
 }

@@ -2256,7 +2256,7 @@ protected:
 TEST_F(VCFTest___to_string___Fixture, graph_type_is_simple_sv_is_snp)
 {
     std::string actual = vcf_with_all_records->to_string(
-        true, false, false, true, false, false, true, false, false, false);
+        true, false, nullptr, false, true, false, false, true, false, false, false);
 
     std::string expected = "##Dummy_header;\n0\t1\t.\t0\t0\t.\t.\tSVTYPE=SNP;GRAPHTYPE="
                            "SIMPLE\tGT:MEAN_FWD_COVG:MEAN_REV_COVG:MED_FWD_COVG:MED_"
@@ -2268,7 +2268,7 @@ TEST_F(VCFTest___to_string___Fixture, graph_type_is_simple_sv_is_snp)
 TEST_F(VCFTest___to_string___Fixture, graph_type_is_nested_sv_is_snp)
 {
     std::string actual = vcf_with_all_records->to_string(
-        true, false, false, false, true, false, true, false, false, false);
+        true, false, nullptr, false, false, true, false, true, false, false, false);
 
     std::string expected = "##Dummy_header;\n0\t2\t.\t0\t0\t.\t.\tSVTYPE=SNP;GRAPHTYPE="
                            "NESTED\tGT:MEAN_FWD_COVG:MEAN_REV_COVG:MED_FWD_COVG:MED_"
@@ -2280,7 +2280,7 @@ TEST_F(VCFTest___to_string___Fixture, graph_type_is_nested_sv_is_snp)
 TEST_F(VCFTest___to_string___Fixture, graph_type_has_too_many_alts_sv_is_snp)
 {
     std::string actual = vcf_with_all_records->to_string(
-        true, false, false, false, false, true, true, false, false, false);
+        true, false, nullptr, false, false, false, true, true, false, false, false);
 
     std::string expected = "##Dummy_header;\n0\t3\t.\t0\t0\t.\t.\tSVTYPE=SNP;GRAPHTYPE="
                            "TOO_MANY_ALTS\tGT:MEAN_FWD_COVG:MEAN_REV_COVG:MED_FWD_COVG:"
@@ -2292,7 +2292,7 @@ TEST_F(VCFTest___to_string___Fixture, graph_type_has_too_many_alts_sv_is_snp)
 TEST_F(VCFTest___to_string___Fixture, graph_type_is_simple_sv_is_indel)
 {
     std::string actual = vcf_with_all_records->to_string(
-        true, false, false, true, false, false, false, true, false, false);
+        true, false, nullptr,false, true, false, false, false, true, false, false);
 
     std::string expected = "##Dummy_header;\n0\t4\t.\t0\t0\t.\t.\tSVTYPE=INDEL;"
                            "GRAPHTYPE=SIMPLE\tGT:MEAN_FWD_COVG:MEAN_REV_COVG:MED_FWD_"
@@ -2304,7 +2304,7 @@ TEST_F(VCFTest___to_string___Fixture, graph_type_is_simple_sv_is_indel)
 TEST_F(VCFTest___to_string___Fixture, graph_type_is_simple_sv_is_ph_snps)
 {
     std::string actual = vcf_with_all_records->to_string(
-        true, false, false, true, false, false, false, false, true, false);
+        true, false, nullptr,false, true, false, false, false, false, true, false);
 
     std::string expected = "##Dummy_header;\n0\t5\t.\t0\t0\t.\t.\tSVTYPE=PH_SNPs;"
                            "GRAPHTYPE=SIMPLE\tGT:MEAN_FWD_COVG:MEAN_REV_COVG:MED_FWD_"
@@ -2316,7 +2316,7 @@ TEST_F(VCFTest___to_string___Fixture, graph_type_is_simple_sv_is_ph_snps)
 TEST_F(VCFTest___to_string___Fixture, graph_type_is_simple_sv_is_complex)
 {
     std::string actual = vcf_with_all_records->to_string(
-        true, false, false, true, false, false, false, false, false, true);
+        true, false, nullptr, false, true, false, false, false, false, false, true);
 
     std::string expected = "##Dummy_header;\n0\t6\t.\t0\t0\t.\t.\tSVTYPE=COMPLEX;"
                            "GRAPHTYPE=SIMPLE\tGT:MEAN_FWD_COVG:MEAN_REV_COVG:MED_FWD_"
@@ -2328,7 +2328,7 @@ TEST_F(VCFTest___to_string___Fixture, graph_type_is_simple_sv_is_complex)
 TEST_F(VCFTest___to_string___Fixture, record_with_dot_allele)
 {
     std::string actual = vcf_with_all_records->to_string(
-        true, false, true, false, false, false, false, false, false, false);
+        true, false, nullptr, true, false, false, false, false, false, false, false);
 
     std::string expected
         = "##Dummy_header;\n0\t7\t.\t.\t.\t.\t.\t.;.\tGT:MEAN_FWD_COVG:MEAN_REV_COVG:"
@@ -2340,7 +2340,7 @@ TEST_F(VCFTest___to_string___Fixture, record_with_dot_allele)
 TEST_F(VCFTest___to_string___Fixture, all_records_filtered_out)
 {
     std::string actual = vcf_with_all_records->to_string(
-        true, false, false, false, false, false, false, false, false, false);
+        true, false, nullptr, false, false, false, false, false, false, false, false);
 
     std::string expected = "##Dummy_header;\n";
 
@@ -2350,7 +2350,7 @@ TEST_F(VCFTest___to_string___Fixture, all_records_filtered_out)
 TEST_F(VCFTest___to_string___Fixture, no_records_filtered_out)
 {
     std::string actual = vcf_with_all_records->to_string(
-        true, false, true, true, true, true, true, true, true, true);
+        true, false, nullptr, true, true, true, true, true, true, true, true);
 
     std::string expected = "##Dummy_header;\n";
     expected
@@ -2471,6 +2471,7 @@ protected:
         using VCF::VCF;
         MOCK_METHOD(std::string, to_string,
             (bool genotyping_from_maximum_likelihood, bool genotyping_from_coverage,
+                const GCPWrappers* const gcp_wrappers,
                 bool output_dot_allele, bool graph_is_simple, bool graph_is_nested,
                 bool graph_has_too_many_alts, bool sv_type_is_snp,
                 bool sv_type_is_indel, bool sv_type_is_ph_snps,
@@ -2490,21 +2491,21 @@ protected:
 TEST_F(VCFTest___save___Fixture, save_true_then_false_flags)
 {
     EXPECT_CALL(
-        vcf, to_string(true, false, true, false, true, false, true, false, true, false))
+        vcf, to_string(true, false, nullptr, true, false, true, false, true, false, true, false))
         .Times(1);
 
     vcf.save(
-        "/dev/null", true, false, true, false, true, false, true, false, true, false);
+        "/dev/null", true, false, nullptr, true, false, true, false, true, false, true, false);
 }
 
 TEST_F(VCFTest___save___Fixture, save_false_then_true_flags)
 {
     EXPECT_CALL(
-        vcf, to_string(false, true, false, true, false, true, false, true, false, true))
+        vcf, to_string(false, true, nullptr, false, true, false, true, false, true, false, true))
         .Times(1);
 
     vcf.save(
-        "/dev/null", false, true, false, true, false, true, false, true, false, true);
+        "/dev/null", false, true, nullptr, false, true, false, true, false, true, false, true);
 }
 
 TEST(VCFTest, concatenate_VCFs)

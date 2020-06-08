@@ -359,7 +359,9 @@ private:
             (bool genotyping_from_maximum_likelihood, bool genotyping_from_coverage),
             (const override));
         MOCK_METHOD(std::string, sample_infos_to_string,
-            (bool genotyping_from_maximum_likelihood, bool genotyping_from_coverage),
+            (bool genotyping_from_maximum_likelihood,
+             bool genotyping_from_coverage,
+             const GCPWrappers* const gcp_wrappers),
             (const override));
     };
 

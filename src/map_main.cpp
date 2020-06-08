@@ -26,6 +26,7 @@
 #include "index.h"
 #include "estimate_parameters.h"
 #include "noise_filtering.h"
+#include "GCPWrapper.h"
 
 #include "denovo_discovery/denovo_utils.h"
 #include "denovo_discovery/denovo_discovery.h"
@@ -436,8 +437,12 @@ int pandora_map(int argc, char* argv[])
     pangraph->add_hits_to_kmergraphs(prgs);
 
     cout << now() << "Estimate parameters for kmer graph model" << endl;
-    auto exp_depth_covg
-        = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
+    RNGModels rng_models;
+    uint32_t exp_depth_covg;
+    std::shared_ptr<RNGModel> rng_model;
+    std::tie(exp_depth_covg, rng_model) = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
+    rng_models.push_back(rng_model);
+
     genotyping_options.add_exp_depth_covg(exp_depth_covg);
     if (genotyping_options.get_min_kmer_covg() == 0)
         genotyping_options.set_min_kmer_covg(exp_depth_covg / 10);
@@ -568,7 +573,7 @@ int pandora_map(int argc, char* argv[])
         master_vcf.genotype(do_global_genotyping, do_local_genotyping);
         if (snps_only)
             master_vcf.save(outdir + "/pandora_genotyped_" + genotype + ".vcf", false,
-                true, false, true, true, true, true, false, false, false);
+                true, nullptr, false, true, true, true, true, false, false, false);
         else
             master_vcf.save(
                 outdir + "/pandora_genotyped_" + genotype + ".vcf", false, true);

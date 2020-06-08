@@ -5,6 +5,7 @@
 #include <cstring>
 #include <cstdint>
 #include <boost/filesystem.hpp>
+#include "GCPWrapper.h"
 
 namespace fs = boost::filesystem;
 
@@ -18,7 +19,14 @@ uint32_t find_mean_covg(std::vector<uint32_t>&);
 
 int find_prob_thresh(std::vector<uint32_t>&);
 
-uint32_t estimate_parameters(std::shared_ptr<pangenome::Graph>, const std::string&,
-    const uint32_t, float&, const uint32_t, bool& bin, const uint32_t& sample_id);
+/**
+ * Estimate Kmer coverage models parameters for a sample.
+ * This has the side effect of changing kmer_prg_with_coverage objects.
+ * @return : the expected depth coverage of the sample, and a RNGModel object that models random coverages of this sample.
+ */
+using ExpDepthCovg = uint32_t;
+std::pair<ExpDepthCovg, std::shared_ptr<RNGModel>> estimate_parameters(const std::shared_ptr<pangenome::Graph> &pangraph,
+                                                                       const std::string& outdir, const uint32_t k, float& e_rate, const uint32_t covg,
+                                                                       bool& bin, const uint32_t sample_id);
 
 #endif

@@ -461,7 +461,8 @@ std::vector<VCFRecord*> VCF::get_all_records_overlapping_the_given_record(
 }
 
 void VCF::save(const std::string& filepath, bool genotyping_from_maximum_likelihood,
-    bool genotyping_from_coverage, bool output_dot_allele, bool graph_is_simple,
+    bool genotyping_from_coverage, const GCPWrappers* const gcp_wrappers,
+    bool output_dot_allele, bool graph_is_simple,
     bool graph_is_nested, bool graph_has_too_many_alts, bool sv_type_is_snp,
     bool sv_type_is_indel, bool sv_type_is_ph_snps, bool sv_type_is_complex)
 {
@@ -469,7 +470,8 @@ void VCF::save(const std::string& filepath, bool genotyping_from_maximum_likelih
     std::ofstream handle;
     handle.open(filepath);
     handle << this->to_string(genotyping_from_maximum_likelihood,
-        genotyping_from_coverage, output_dot_allele, graph_is_simple, graph_is_nested,
+        genotyping_from_coverage, gcp_wrappers,
+        output_dot_allele, graph_is_simple, graph_is_nested,
         graph_has_too_many_alts, sv_type_is_snp, sv_type_is_indel, sv_type_is_ph_snps,
         sv_type_is_complex);
     handle.close();
@@ -544,7 +546,9 @@ std::string VCF::header() const
 }
 
 std::string VCF::to_string(bool genotyping_from_maximum_likelihood,
-    bool genotyping_from_coverage, bool output_dot_allele, bool graph_is_simple,
+    bool genotyping_from_coverage,
+    const GCPWrappers* const gcp_wrappers,
+    bool output_dot_allele, bool graph_is_simple,
     bool graph_is_nested, bool graph_has_too_many_alts, bool sv_type_is_snp,
     bool sv_type_is_indel, bool sv_type_is_ph_snps, bool sv_type_is_complex)
 {
@@ -580,8 +584,9 @@ std::string VCF::to_string(bool genotyping_from_maximum_likelihood,
             or graph_and_sv_type_conditions_are_satisfied;
 
         if (record_should_be_output) {
-            out << record->to_string(
-                genotyping_from_maximum_likelihood, genotyping_from_coverage)
+            out << record->to_string(genotyping_from_maximum_likelihood,
+                genotyping_from_coverage,
+                gcp_wrappers)
                 << std::endl;
         }
     }

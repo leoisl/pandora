@@ -186,8 +186,9 @@ TEST(EstimateParameters_EstimateParameters, NoPangraphNodes)
 
     auto pangraph = std::make_shared<pangenome::Graph>(pangenome::Graph());
 
-    auto expected_depth_covg
-        = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
+    uint32_t expected_depth_covg;
+    std::shared_ptr<RNGModel> rng_model;
+    std::tie(expected_depth_covg, rng_model) = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
     EXPECT_EQ(expected_depth_covg, (uint)10);
 }
 
@@ -209,8 +210,9 @@ TEST(EstimateParameters_EstimateParameters, PangraphWithNodes_SimpleBinomial)
         illumina);
     pangraph->add_hits_to_kmergraphs(prgs);
 
-    auto expected_depth_covg
-        = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
+    uint32_t expected_depth_covg;
+    std::shared_ptr<RNGModel> rng_model;
+    std::tie(expected_depth_covg, rng_model) = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
     EXPECT_NEAR(expected_depth_covg, (uint)4, 1);
 }
 
@@ -233,8 +235,9 @@ TEST(
         illumina);
     pangraph->add_hits_to_kmergraphs(prgs);
 
-    auto expected_depth_covg
-        = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
+    uint32_t expected_depth_covg;
+    std::shared_ptr<RNGModel> rng_model;
+    std::tie(expected_depth_covg, rng_model) = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
     EXPECT_NEAR(expected_depth_covg, (uint)2, 1);
 }
 
@@ -256,8 +259,9 @@ TEST(EstimateParameters_EstimateParameters, PangraphWithNodes_SimpleNegativeBino
         illumina);
     pangraph->add_hits_to_kmergraphs(prgs);
 
-    auto expected_depth_covg
-        = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
+    uint32_t expected_depth_covg;
+    std::shared_ptr<RNGModel> rng_model;
+    std::tie(expected_depth_covg, rng_model) = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
     EXPECT_NEAR(expected_depth_covg, (uint)4, 1);
 }
 
@@ -280,8 +284,9 @@ TEST(EstimateParameters_EstimateParameters,
         illumina);
     pangraph->add_hits_to_kmergraphs(prgs);
 
-    auto expected_depth_covg
-        = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
+    uint32_t expected_depth_covg;
+    std::shared_ptr<RNGModel> rng_model;
+    std::tie(expected_depth_covg, rng_model) = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
     EXPECT_NEAR(
         expected_depth_covg, (uint)40, 1); // NB method overestimates covg, true is 32
 }
@@ -305,8 +310,9 @@ TEST(EstimateParameters_EstimateParameters,
         illumina);
     pangraph->add_hits_to_kmergraphs(prgs);
 
-    auto expected_depth_covg
-        = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
+    uint32_t expected_depth_covg;
+    std::shared_ptr<RNGModel> rng_model;
+    std::tie(expected_depth_covg, rng_model) = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
     EXPECT_NEAR(
         expected_depth_covg, (uint)32, 1); // NB method overestimates covg, true is 32
 }
@@ -329,7 +335,8 @@ TEST(EstimateParameters_EstimateParameters, PangraphWithNodes_NoiseReads)
         illumina);
     pangraph->add_hits_to_kmergraphs(prgs);
 
-    auto expected_depth_covg
-        = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
+    uint32_t expected_depth_covg;
+    std::shared_ptr<RNGModel> rng_model;
+    std::tie(expected_depth_covg, rng_model) = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
     EXPECT_NEAR(expected_depth_covg, (uint)5, 1);
 }

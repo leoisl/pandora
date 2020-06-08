@@ -1146,7 +1146,7 @@ TEST_F(SampleInfoTest___Fixture, to_string___genotyping_from_compatible_coverage
     std::string actual = default_sample_info_three_alleles.to_string(false, true);
 
     std::string expected = "2:10,25,53:70,85,116:10,25,50:70,85,120:10,50,160:70,170,"
-                           "350:0,0,0:-1559.97,-1558.47,-1577.88:1.50545";
+                           "350:0,0,0:-1559.97,-1558.47,-1577.88:1.50545:.";
     EXPECT_EQ(actual, expected);
 }
 
@@ -1220,7 +1220,8 @@ public:
             (override));
         MOCK_METHOD(std::string, to_string,
             (bool genotyping_from_maximum_likelihood,
-                bool genotyping_from_compatible_coverage),
+             bool genotyping_from_compatible_coverage,
+             const GCPWrapper* const gcp_wrapper),
             (const override));
     };
 

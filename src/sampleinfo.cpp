@@ -239,6 +239,26 @@ std::string SampleInfo::get_confidence_to_string() const
     return ss.str();
 }
 
+std::string SampleInfo::get_confidence_percentile_to_string(const GCPWrapper* const gcp_wrapper) const
+{
+    if (gcp_wrapper == nullptr) {
+        return ".";
+    }
+
+    std::stringstream ss;
+    auto index_and_confidence_and_max_likelihood_optional = get_confidence();
+
+    if (index_and_confidence_and_max_likelihood_optional) {
+        double confidence = std::get<1>(*index_and_confidence_and_max_likelihood_optional);
+        double confidence_percentile = gcp_wrapper->get_confidence_percentile(confidence);
+        ss << confidence_percentile;
+    } else {
+        ss << ".";
+    }
+
+    return ss.str();
+}
+
 boost::optional<SampleInfo::GenotypeAndMaxLikelihood>
 SampleInfo::get_genotype_from_coverage() const
 {
@@ -261,7 +281,8 @@ SampleInfo::get_genotype_from_coverage() const
 }
 
 std::string SampleInfo::to_string(bool genotyping_from_maximum_likelihood,
-    bool genotyping_from_compatible_coverage) const
+    bool genotyping_from_compatible_coverage,
+    const GCPWrapper* const gcp_wrapper) const
 {
     bool only_one_flag_is_set = ((int)(genotyping_from_maximum_likelihood)
                                     + (int)(genotyping_from_compatible_coverage))
@@ -302,6 +323,7 @@ std::string SampleInfo::to_string(bool genotyping_from_maximum_likelihood,
         }
 
         out << ":" << get_confidence_to_string();
+        out << ":" << get_confidence_percentile_to_string(gcp_wrapper);
     }
 
     return out.str();

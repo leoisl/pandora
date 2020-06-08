@@ -95,7 +95,9 @@ public:
     // to_string methods
     virtual std::string header() const;
     virtual std::string to_string(bool genotyping_from_maximum_likelihood,
-        bool genotyping_from_coverage, bool output_dot_allele = false,
+        bool genotyping_from_coverage,
+        const GCPWrappers* const gcp_wrappers = nullptr,
+        bool output_dot_allele = false,
         bool graph_is_simple = true, bool graph_is_nested = true,
         bool graph_has_too_many_alts = true, bool sv_type_is_snp = true,
         bool sv_type_is_indel = true, bool sv_type_is_ph_snps = true,
@@ -116,6 +118,7 @@ public:
     // fact
     virtual void save(const std::string& filepath,
         bool genotyping_from_maximum_likelihood, bool genotyping_from_coverage,
+        const GCPWrappers* const gcp_wrappers = nullptr,
         bool output_dot_allele = false, bool graph_is_simple = true,
         bool graph_is_nested = true, bool graph_has_too_many_alts = true,
         bool sv_type_is_snp = true, bool sv_type_is_indel = true,
