@@ -273,6 +273,15 @@ public:
         bool genotyping_from_compatible_coverage,
         const GCPWrapper* const gcp_wrapper = nullptr) const;
 
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // equality operators
+    bool operator==(const SampleInfo& rhs) const;
+    bool operator!=(const SampleInfo& rhs) const;
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 protected:
     uint32_t sample_index;
     uint32_t number_of_alleles;

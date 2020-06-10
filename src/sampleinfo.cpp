@@ -420,3 +420,17 @@ void SampleInfo::set_number_of_alleles_and_resize_coverage_information(
     resize_to_the_number_of_alleles();
     assert(check_if_coverage_information_is_correct());
 }
+bool SampleInfo::operator==(const SampleInfo& rhs) const
+{
+    return std::tie(sample_index, number_of_alleles, genotyping_options,
+               exp_depth_covg_for_this_sample, GT_from_maximum_likelihood_path,
+               allele_to_forward_coverages, allele_to_reverse_coverages,
+               GT_from_coverages, likelihood_of_GT_from_coverages,
+               GT_from_coverages_compatible)
+        == std::tie(rhs.sample_index, rhs.number_of_alleles, rhs.genotyping_options,
+            rhs.exp_depth_covg_for_this_sample, rhs.GT_from_maximum_likelihood_path,
+            rhs.allele_to_forward_coverages, rhs.allele_to_reverse_coverages,
+            rhs.GT_from_coverages, rhs.likelihood_of_GT_from_coverages,
+            rhs.GT_from_coverages_compatible);
+}
+bool SampleInfo::operator!=(const SampleInfo& rhs) const { return !(rhs == *this); }

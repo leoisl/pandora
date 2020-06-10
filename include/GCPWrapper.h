@@ -65,10 +65,13 @@ private:
 class GCPWrapper {
 public:
     GCPWrapper(const std::shared_ptr<GCPSampleInfoModel> &model) : model(model){
-        train();
+        if (model != nullptr) {
+            train();
+        }
+
     }
 
-    GCP::GenotypePercentile get_confidence_percentile(GCP::GenotypeConfidence queried_confidence) const {
+    virtual GCP::GenotypePercentile get_confidence_percentile(GCP::GenotypeConfidence queried_confidence) const {
         return genotype_confidence_percentiler->get_confidence_percentile(queried_confidence);
     }
 

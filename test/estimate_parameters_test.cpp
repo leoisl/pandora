@@ -190,6 +190,8 @@ TEST(EstimateParameters_EstimateParameters, NoPangraphNodes)
     std::shared_ptr<RNGModel> rng_model;
     std::tie(expected_depth_covg, rng_model) = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
     EXPECT_EQ(expected_depth_covg, (uint)10);
+    ConstantModel expected_model(10);
+    EXPECT_EQ(expected_model, *(ConstantModel*)(rng_model.get()));
 }
 
 TEST(EstimateParameters_EstimateParameters, PangraphWithNodes_SimpleBinomial)
@@ -214,6 +216,8 @@ TEST(EstimateParameters_EstimateParameters, PangraphWithNodes_SimpleBinomial)
     std::shared_ptr<RNGModel> rng_model;
     std::tie(expected_depth_covg, rng_model) = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
     EXPECT_NEAR(expected_depth_covg, (uint)4, 1);
+    BinomialModel expected_model(5.0476190476190474, 0.9417644739151001);
+    EXPECT_EQ(expected_model, *(BinomialModel*)(rng_model.get()));
 }
 
 TEST(
@@ -239,6 +243,8 @@ TEST(
     std::shared_ptr<RNGModel> rng_model;
     std::tie(expected_depth_covg, rng_model) = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
     EXPECT_NEAR(expected_depth_covg, (uint)2, 1);
+    BinomialModel expected_model(3, 0.9417644739151001);
+    EXPECT_EQ(expected_model, *(BinomialModel*)(rng_model.get()));
 }
 
 TEST(EstimateParameters_EstimateParameters, PangraphWithNodes_SimpleNegativeBinomial)
@@ -263,6 +269,8 @@ TEST(EstimateParameters_EstimateParameters, PangraphWithNodes_SimpleNegativeBino
     std::shared_ptr<RNGModel> rng_model;
     std::tie(expected_depth_covg, rng_model) = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
     EXPECT_NEAR(expected_depth_covg, (uint)4, 1);
+    NegativeBinomialModel expected_model(2, 0.014999999664723873);
+    EXPECT_EQ(expected_model, *(NegativeBinomialModel*)(rng_model.get()));
 }
 
 TEST(EstimateParameters_EstimateParameters,
@@ -289,6 +297,8 @@ TEST(EstimateParameters_EstimateParameters,
     std::tie(expected_depth_covg, rng_model) = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
     EXPECT_NEAR(
         expected_depth_covg, (uint)40, 1); // NB method overestimates covg, true is 32
+    NegativeBinomialModel expected_model(3.392768383026123, 0.077506966888904572);
+    EXPECT_EQ(expected_model, *(NegativeBinomialModel*)(rng_model.get()));
 }
 
 TEST(EstimateParameters_EstimateParameters,
@@ -315,6 +325,8 @@ TEST(EstimateParameters_EstimateParameters,
     std::tie(expected_depth_covg, rng_model) = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
     EXPECT_NEAR(
         expected_depth_covg, (uint)32, 1); // NB method overestimates covg, true is 32
+    BinomialModel expected_model(40.38095238095238, 0.9417644739151001);
+    EXPECT_EQ(expected_model, *(BinomialModel*)(rng_model.get()));
 }
 
 TEST(EstimateParameters_EstimateParameters, PangraphWithNodes_NoiseReads)
@@ -339,4 +351,6 @@ TEST(EstimateParameters_EstimateParameters, PangraphWithNodes_NoiseReads)
     std::shared_ptr<RNGModel> rng_model;
     std::tie(expected_depth_covg, rng_model) = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
     EXPECT_NEAR(expected_depth_covg, (uint)5, 1);
+    NegativeBinomialModel expected_model(2, 0.014999999664723873);
+    EXPECT_EQ(expected_model, *(NegativeBinomialModel*)(rng_model.get()));
 }

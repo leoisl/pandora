@@ -24,6 +24,12 @@ public:
                                                           double negative_binomial_parameter_r,
                                                           double negative_binomial_parameter_p);
 
+    bool operator==(const RNGModel& rhs) const
+    {
+        return random_number_generator == rhs.random_number_generator;
+    }
+    bool operator!=(const RNGModel& rhs) const { return !(rhs == *this); }
+
 protected:
     std::default_random_engine random_number_generator;
     RNGModel() : random_number_generator(){}
@@ -42,6 +48,13 @@ public:
         return uint32_t(std::max(nb_distribution(random_number_generator), 0));
     }
 
+    bool operator==(const NegativeBinomialModel& rhs) const
+    {
+        return std::tie(static_cast<const RNGModel&>(*this), nb_distribution)
+            == std::tie(static_cast<const RNGModel&>(rhs), rhs.nb_distribution);
+    }
+    bool operator!=(const NegativeBinomialModel& rhs) const { return !(rhs == *this); }
+
 private:
     boost::random::negative_binomial_distribution<> nb_distribution;
 };
@@ -58,6 +71,13 @@ public:
     virtual uint32_t get_random_value() {
         return uint32_t(std::max(binomial_distribution(random_number_generator), 0));
     }
+
+    bool operator==(const BinomialModel& rhs) const
+    {
+        return std::tie(static_cast<const RNGModel&>(*this), binomial_distribution)
+            == std::tie(static_cast<const RNGModel&>(rhs), rhs.binomial_distribution);
+    }
+    bool operator!=(const BinomialModel& rhs) const { return !(rhs == *this); }
 
 private:
     boost::random::binomial_distribution<> binomial_distribution;
@@ -77,6 +97,13 @@ public:
     virtual uint32_t get_random_value() {
         return value;
     }
+
+    bool operator==(const ConstantModel& rhs) const
+    {
+        return std::tie(static_cast<const RNGModel&>(*this), value)
+            == std::tie(static_cast<const RNGModel&>(rhs), rhs.value);
+    }
+    bool operator!=(const ConstantModel& rhs) const { return !(rhs == *this); }
 
 private:
     uint32_t value;

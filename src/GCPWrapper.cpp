@@ -9,10 +9,10 @@ SampleInfo GCPSampleInfoModel::produce_data()
 
     // split the simulated coverages into forward and reverse coverages
     std::vector<std::vector<uint32_t>> allele_to_forward_coverages {
-        { uint32_t(floor(coverages[0]/2)) }, { uint32_t(floor(coverages[1]/2)) }
+        { uint32_t(floor(coverages[0]/2.0)) }, { uint32_t(floor(coverages[1]/2.0)) }
     };
     std::vector<std::vector<uint32_t>> allele_to_reverse_coverages {
-        { uint32_t(ceil(coverages[0]/2)) }, { uint32_t(ceil(coverages[1]/2)) }
+        { uint32_t(ceil(coverages[0]/2.0)) }, { uint32_t(ceil(coverages[1]/2.0)) }
     };
 
     sample_info.set_coverage_information(
@@ -22,6 +22,7 @@ SampleInfo GCPSampleInfoModel::produce_data()
 }
 
 
+// NB : trivial method, not tested
 GCPSampleInfoModels::GCPSampleInfoModels(const RNGModels &rng_models, GenotypingOptions const* genotyping_options) {
     for (uint32_t sample_index = 0; sample_index < rng_models.size(); ++sample_index) {
         std::shared_ptr<GCPSampleInfoModel> gcp_sample_info_model = std::make_shared<GCPSampleInfoModel>(sample_index, genotyping_options, rng_models[sample_index]);
@@ -43,6 +44,8 @@ double GCPGenotyperAdapter::get_genotype_confidence() const
     return confidence;
 }
 
+
+// NB : trivial method, not tested
 void GCPWrapper::train() {
     // simulate 10000 confidences according to our Model and our Genotyper
     GCP::Simulator<SampleInfo, GCPGenotyperAdapter> genotype_confidence_simulator(model.get());
@@ -53,6 +56,7 @@ void GCPWrapper::train() {
 }
 
 
+// NB : trivial method, not tested
 GCPWrappers::GCPWrappers (const GCPSampleInfoModels &sample_info_models) {
     for (const std::shared_ptr<GCPSampleInfoModel> &sample_info_model : sample_info_models) {
         GCPWrapper gcp_wrapper(sample_info_model);

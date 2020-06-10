@@ -77,6 +77,8 @@ public:
     public:
         using SampleInfo::compute_likelihood;
         using SampleInfo::SampleInfo;
+        MOCK_METHOD(std::string, get_confidence_percentile_to_string,
+                    (const GCPWrapper* const gcp_wrapper), (const override));
     };
 
     SampleInfoTest___Fixture()
@@ -1142,11 +1144,12 @@ TEST_F(SampleInfoTest___Fixture, to_string___genotyping_from_compatible_coverage
     default_sample_info_three_alleles.set_coverage_information(
         { { 10 }, { 20, 30 }, { 40, 50, 70 } },
         { { 70 }, { 80, 90 }, { 100, 120, 130 } });
+    EXPECT_CALL(default_sample_info_three_alleles, get_confidence_percentile_to_string).Times(1).WillOnce(Return("50.5"));
 
     std::string actual = default_sample_info_three_alleles.to_string(false, true);
 
     std::string expected = "2:10,25,53:70,85,116:10,25,50:70,85,120:10,50,160:70,170,"
-                           "350:0,0,0:-1559.97,-1558.47,-1577.88:1.50545:.";
+                           "350:0,0,0:-1559.97,-1558.47,-1577.88:1.50545:50.5";
     EXPECT_EQ(actual, expected);
 }
 
@@ -1880,6 +1883,77 @@ TEST_F(SampleInfoTest___get_confidence___Fixture, get_confidence___handles_alt_c
     EXPECT_NEAR(-std::numeric_limits<double>::lowest() - 1.5, confidence, 0.000001);
     EXPECT_NEAR(-1.5, max_likelihood, 0.000001);
 }
+
+
+
+
+class SampleInfoTest___get_confidence_percentile_to_string___Fixture : public ::testing::Test {
+public:
+    class SampleInfoMock : public SampleInfo {
+    public:
+        using SampleInfo::SampleInfo;
+        MOCK_METHOD(boost::optional<SampleInfo::IndexAndConfidenceAndMaxLikelihood>,
+                    get_confidence, (), (const override));
+    };
+
+    class GCPWrapperMock : public GCPWrapper {
+    public:
+        GCPWrapperMock() : GCPWrapper(std::shared_ptr<GCPSampleInfoModel>(nullptr)){}
+        MOCK_METHOD(GCP::GenotypePercentile, get_confidence_percentile,
+                   (GCP::GenotypeConfidence queried_confidence), (const override));
+
+    };
+
+
+    SampleInfoTest___get_confidence_percentile_to_string___Fixture()
+        : sample_info(0, 2, &default_genotyping_options), gcp_wrapper() {}
+
+    void SetUp() override {}
+
+    void TearDown() override {}
+
+    SampleInfoMock sample_info;
+    GCPWrapperMock gcp_wrapper;
+};
+
+
+TEST_F(SampleInfoTest___get_confidence_percentile_to_string___Fixture, invalid_confidence_and_null_gcpwrapper)
+{
+    auto actual = sample_info.get_confidence_percentile_to_string(nullptr);
+
+    EXPECT_EQ(".", actual);
+}
+
+
+TEST_F(SampleInfoTest___get_confidence_percentile_to_string___Fixture, invalid_confidence_and_valid_gcpwrapper)
+{
+    EXPECT_CALL(sample_info, get_confidence).Times(1).WillOnce(Return(boost::none));
+    EXPECT_CALL(gcp_wrapper, get_confidence_percentile).Times(0);
+    auto actual = sample_info.get_confidence_percentile_to_string(&gcp_wrapper);
+
+    EXPECT_EQ(".", actual);
+}
+
+TEST_F(SampleInfoTest___get_confidence_percentile_to_string___Fixture, valid_confidence_and_null_gcpwrapper)
+{
+    auto actual = sample_info.get_confidence_percentile_to_string(nullptr);
+
+    EXPECT_EQ(".", actual);
+}
+
+
+TEST_F(SampleInfoTest___get_confidence_percentile_to_string___Fixture, valid_confidence_and_valid_gcpwrapper)
+{
+    EXPECT_CALL(sample_info, get_confidence).Times(1).WillOnce(Return(std::make_tuple((size_t)3, 8.5, -10.5)));
+    EXPECT_CALL(gcp_wrapper, get_confidence_percentile).Times(1).WillOnce(Return(20.5));
+    auto actual = sample_info.get_confidence_percentile_to_string(&gcp_wrapper);
+
+    EXPECT_EQ("20.5", actual);
+}
+
+
+
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // REGENOTYPE TESTS
