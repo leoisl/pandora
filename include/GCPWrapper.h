@@ -4,7 +4,7 @@
 #include "sampleinfo.h"
 #include "GCP.h"
 #include "OptionsAggregator.h"
-#include "KmerCoverageModels.h"
+#include "KmerCoverageModel.h"
 
 // forward declarations
 class SampleInfo;
@@ -19,22 +19,20 @@ public:
      * Builds a GCPSampleInfoModel
      * @param sample_index : Required to build a SampleInfo later.
      * @param genotyping_options :  Required to build a SampleInfo later.
-     * @param random_model : Random model used to draw numbers from.
+     * @param kmer_coverage_model : Kmer coverage model used to draw kmer coverages from.
      */
     GCPSampleInfoModel(uint32_t sample_index,
                        GenotypingOptions const* genotyping_options,
-                       std::shared_ptr<RNGModel> random_model) : Model<SampleInfo>(),
-                                                 sample_index(sample_index),
-                                                 genotyping_options(genotyping_options),
-                                                 random_model(random_model) {
-    }
+                       std::shared_ptr<KmerCoverageModel> kmer_coverage_model) :
+        Model<SampleInfo>(), sample_index(sample_index), genotyping_options(genotyping_options),
+        kmer_coverage_model(kmer_coverage_model) {}
 
     SampleInfo produce_data() override;
 
 private:
     uint32_t sample_index;
     GenotypingOptions const* genotyping_options;
-    std::shared_ptr<RNGModel> random_model;
+    std::shared_ptr<KmerCoverageModel> kmer_coverage_model;
 };
 
 /**
@@ -42,7 +40,7 @@ private:
  */
 class GCPSampleInfoModels : public std::vector<std::shared_ptr<GCPSampleInfoModel>>{
 public:
-    GCPSampleInfoModels(const RNGModels &rng_models, GenotypingOptions const* genotyping_options);
+    GCPSampleInfoModels(const KmerCoverageModels &kmer_coverage_models, GenotypingOptions const* genotyping_options);
 };
 
 

@@ -1,11 +1,10 @@
-#ifndef PANDORA_KMERCOVERAGEMODELS_H
-#define PANDORA_KMERCOVERAGEMODELS_H
+#ifndef PANDORA_RNGMODEL_H
+#define PANDORA_RNGMODEL_H
 
 #include <memory>
 #include <random>
 #include <boost/random/negative_binomial_distribution.hpp>
 #include <boost/random/binomial_distribution.hpp>
-
 
 
 enum ModelType { NegativeBinomialModelType, BinomialModelType, ConstantModelType };
@@ -15,14 +14,6 @@ enum ModelType { NegativeBinomialModelType, BinomialModelType, ConstantModelType
 class RNGModel {
 public:
     virtual uint32_t get_random_value() = 0;
-
-    // NB: see function estimate_parameters() for details.
-    static std::shared_ptr<RNGModel> create_new_RNG_model(ModelType model_type,
-                                                          uint32_t exp_depth_covg,
-                                                          double mean_kmer_coverage,
-                                                          double binomial_parameter_p,
-                                                          double negative_binomial_parameter_r,
-                                                          double negative_binomial_parameter_p);
 
     bool operator==(const RNGModel& rhs) const
     {
@@ -40,6 +31,9 @@ protected:
  */
 class NegativeBinomialModel : public RNGModel {
 public:
+    // TODO: while boost::math::negative_binomial accepts a continuous negative_binomial_parameter_r value,
+    // TODO: boost::random::negative_binomial_distribution do not. Thus, here negative_binomial_parameter_r is
+    // TODO: implicitly truncated from double to int, and we have differences on the distribution due to this
     NegativeBinomialModel(double negative_binomial_parameter_r, double negative_binomial_parameter_p) :
         RNGModel(),
         nb_distribution(negative_binomial_parameter_r, negative_binomial_parameter_p) {}
@@ -109,14 +103,4 @@ private:
     uint32_t value;
 };
 
-
-/**
- * Container that stores and manages a vector of RNGModels, one per sample.
- * Holds a pointer to RNGModel so that we can apply polymorphism.
- */
-class RNGModels : public std::vector<std::shared_ptr<RNGModel>>{
-public:
-using std::vector<std::shared_ptr<RNGModel>>::vector;
-};
-
-#endif // PANDORA_KMERCOVERAGEMODELS_H
+#endif // PANDORA_RNGMODEL_H

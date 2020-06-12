@@ -437,11 +437,11 @@ int pandora_map(int argc, char* argv[])
     pangraph->add_hits_to_kmergraphs(prgs);
 
     cout << now() << "Estimate parameters for kmer graph model" << endl;
-    RNGModels rng_models;
+    KmerCoverageModels kmer_coverage_models;
     uint32_t exp_depth_covg;
-    std::shared_ptr<RNGModel> rng_model;
-    std::tie(exp_depth_covg, rng_model) = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
-    rng_models.push_back(rng_model);
+    std::shared_ptr<KmerCoverageModel> kmer_coverage_model;
+    std::tie(exp_depth_covg, kmer_coverage_model) = estimate_parameters(pangraph, outdir, k, e_rate, covg, bin, sample_id);
+    kmer_coverage_models.push_back(kmer_coverage_model);
 
     genotyping_options.add_exp_depth_covg(exp_depth_covg);
     if (genotyping_options.get_min_kmer_covg() == 0)

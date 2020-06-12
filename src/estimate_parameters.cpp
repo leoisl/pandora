@@ -193,7 +193,7 @@ int find_prob_thresh(std::vector<uint32_t>& kmer_prob_dist)
     return peak - 200;
 }
 
-std::pair<ExpDepthCovg, std::shared_ptr<RNGModel>> estimate_parameters(
+std::pair<ExpDepthCovg, std::shared_ptr<KmerCoverageModel>> estimate_parameters(
     const std::shared_ptr<pangenome::Graph> &pangraph,
     const std::string& outdir, const uint32_t k, float& e_rate, const uint32_t covg,
     bool& bin, const uint32_t sample_id)
@@ -212,8 +212,11 @@ std::pair<ExpDepthCovg, std::shared_ptr<RNGModel>> estimate_parameters(
     if (pangraph->nodes.empty()) {
         BOOST_LOG_TRIVIAL(debug) << "[Estimate Parameters] Trivial case, expected coverage: " << exp_depth_covg;
         BOOST_LOG_TRIVIAL(debug) << "[Estimate Parameters] End";
-        auto constant_rng_model = RNGModel::create_new_RNG_model(ModelType::ConstantModelType, exp_depth_covg, 0, 0, 0, 0);
-        return std::make_pair(exp_depth_covg, constant_rng_model);
+        std::shared_ptr<KmerCoverageModel> constant_model =
+            std::make_shared<KmerCoverageModel>(ModelType::ConstantModelType,
+                ModelType::ConstantModelType,
+                exp_depth_covg, e_rate, 0, 0, 0, 0);
+        return std::make_pair(exp_depth_covg, constant_model);
     }
 
     std::vector<uint32_t> kmer_covg_dist(1000,
@@ -377,18 +380,26 @@ std::pair<ExpDepthCovg, std::shared_ptr<RNGModel>> estimate_parameters(
 
     // defines which RNGModel has to be returned
     const KmerGraphWithCoverage &random_kmer_graph_with_coverage = pangraph->nodes.begin()->second->kmer_prg_with_coverage;
-    std::shared_ptr<RNGModel> rng_model;
+    std::shared_ptr<KmerCoverageModel> kmer_coverage_model;
     if (bin) {
-        rng_model = RNGModel::create_new_RNG_model(ModelType::BinomialModelType, exp_depth_covg,
-                                                             mean, random_kmer_graph_with_coverage.get_binomial_parameter_p(),
-                                                             random_kmer_graph_with_coverage.get_negative_binomial_parameter_r(),
-                                                             random_kmer_graph_with_coverage.get_negative_binomial_parameter_p());
+        kmer_coverage_model = std::make_shared<KmerCoverageModel>(ModelType::BinomialModelType,
+                                                                 ModelType::BinomialModelType,
+                                                                  exp_depth_covg,
+                                                                  e_rate,
+                                                                  mean,
+                                                                  random_kmer_graph_with_coverage.get_binomial_parameter_p(),
+                                                                  random_kmer_graph_with_coverage.get_negative_binomial_parameter_r(),
+                                                                  random_kmer_graph_with_coverage.get_negative_binomial_parameter_p());
     } else {
-        rng_model = RNGModel::create_new_RNG_model(ModelType::NegativeBinomialModelType, exp_depth_covg,
-                                                                      mean, random_kmer_graph_with_coverage.get_binomial_parameter_p(),
-                                                                      random_kmer_graph_with_coverage.get_negative_binomial_parameter_r(),
-                                                                      random_kmer_graph_with_coverage.get_negative_binomial_parameter_p());
+        kmer_coverage_model = std::make_shared<KmerCoverageModel>(ModelType::NegativeBinomialModelType,
+                                                                  ModelType::BinomialModelType,
+                                                                  exp_depth_covg,
+                                                                  e_rate,
+                                                                  mean,
+                                                                  random_kmer_graph_with_coverage.get_binomial_parameter_p(),
+                                                                  random_kmer_graph_with_coverage.get_negative_binomial_parameter_r(),
+                                                                  random_kmer_graph_with_coverage.get_negative_binomial_parameter_p());
     }
 
-    return std::make_pair(exp_depth_covg, rng_model);
+    return std::make_pair(exp_depth_covg, kmer_coverage_model);
 }

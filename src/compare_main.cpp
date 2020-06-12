@@ -397,7 +397,7 @@ int pandora_compare(int argc, char* argv[])
     for (const auto& sample_pair : samples)
         sample_names.push_back(sample_pair.first);
 
-    RNGModels rng_models;
+    KmerCoverageModels kmer_coverage_models;
 
     auto pangraph = std::make_shared<pangenome::Graph>(sample_names);
 
@@ -434,11 +434,11 @@ int pandora_compare(int argc, char* argv[])
 
         BOOST_LOG_TRIVIAL(info) << "Estimate parameters for kmer graph model";
         uint32_t exp_depth_covg;
-        std::shared_ptr<RNGModel> rng_model;
-        std::tie(exp_depth_covg, rng_model) = estimate_parameters(
+        std::shared_ptr<KmerCoverageModel> kmer_coverage_model;
+        std::tie(exp_depth_covg, kmer_coverage_model) = estimate_parameters(
             pangraph_sample, sample_outdir, k, e_rate, covg, bin, 0);
         genotyping_options.add_exp_depth_covg(exp_depth_covg);
-        rng_models.push_back(rng_model);
+        kmer_coverage_models.push_back(kmer_coverage_model);
 
         if (genotyping_options.get_min_kmer_covg() == 0)
             genotyping_options.set_min_kmer_covg(exp_depth_covg / 10);
@@ -485,11 +485,11 @@ int pandora_compare(int argc, char* argv[])
         // each sample and PRG
     }
 
-    // transform the RNG models into GCPWrappers, if we are to genotype
+    // transform the Kmer coverage models into GCPWrappers, if we are to genotype
     std::shared_ptr<GCPWrappers> gcp_wrappers(nullptr);
     if (do_global_genotyping or do_local_genotyping) {
         BOOST_LOG_TRIVIAL(info) << "Simulating genotype confidences and building the Genotype Confidence Percentiler for each sample";
-        GCPSampleInfoModels sample_info_models(rng_models, &genotyping_options);
+        GCPSampleInfoModels sample_info_models(kmer_coverage_models, &genotyping_options);
         gcp_wrappers = std::make_shared<GCPWrappers>(sample_info_models);
     }
 

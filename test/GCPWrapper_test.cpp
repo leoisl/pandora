@@ -8,22 +8,29 @@ using ::testing::Return;
 
 TEST(GCPSampleInfoModelTest, produce_data___random_value_is_even)
 {
-    GCPSampleInfoModel sample_info_model(3, &default_genotyping_options, std::make_shared<ConstantModel>(10));
+    GCPSampleInfoModel sample_info_model(3, &default_genotyping_options,
+        std::make_shared<KmerCoverageModel>(ModelType::ConstantModelType,
+                                                                ModelType::ConstantModelType,
+            10, 0.4, 0, 0, 0, 0));
 
     SampleInfo actual_sample_info = sample_info_model.produce_data();
     SampleInfo expected_sample_info = SampleInfo(3, 2, &default_genotyping_options);
-    expected_sample_info.set_coverage_information({{5}, {5}}, {{5}, {5}});
+    expected_sample_info.set_coverage_information({{5}, {2}}, {{5}, {2}});
 
     EXPECT_EQ(actual_sample_info, expected_sample_info);
 }
 
 TEST(GCPSampleInfoModelTest, produce_data___random_value_is_odd)
 {
-    GCPSampleInfoModel sample_info_model(3, &default_genotyping_options, std::make_shared<ConstantModel>(11));
+    GCPSampleInfoModel sample_info_model(3, &default_genotyping_options,
+     std::make_shared<KmerCoverageModel>(ModelType::ConstantModelType,
+                                         ModelType::ConstantModelType,
+                                         15, 0.2, 0, 0, 0, 0));
+
 
     SampleInfo actual_sample_info = sample_info_model.produce_data();
     SampleInfo expected_sample_info = SampleInfo(3, 2, &default_genotyping_options);
-    expected_sample_info.set_coverage_information({{5}, {5}}, {{6}, {6}});
+    expected_sample_info.set_coverage_information({{7}, {1}}, {{8}, {2}});
 
     EXPECT_EQ(actual_sample_info, expected_sample_info);
 }

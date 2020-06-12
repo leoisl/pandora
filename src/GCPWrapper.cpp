@@ -5,14 +5,15 @@ SampleInfo GCPSampleInfoModel::produce_data()
     // we always simulate 2-allele SNPs only
     SampleInfo sample_info(sample_index, 2, genotyping_options);
 
-    std::vector<uint32_t> coverages{random_model->get_random_value(), random_model->get_random_value()};
+    uint32_t coverage_for_correct_allele = kmer_coverage_model->get_random_coverage_for_correct_allele();
+    uint32_t coverage_for_incorrect_allele = kmer_coverage_model->get_random_coverage_for_incorrect_allele();
 
     // split the simulated coverages into forward and reverse coverages
     std::vector<std::vector<uint32_t>> allele_to_forward_coverages {
-        { uint32_t(floor(coverages[0]/2.0)) }, { uint32_t(floor(coverages[1]/2.0)) }
+        { uint32_t(floor(coverage_for_correct_allele/2.0)) }, { uint32_t(floor(coverage_for_incorrect_allele/2.0)) }
     };
     std::vector<std::vector<uint32_t>> allele_to_reverse_coverages {
-        { uint32_t(ceil(coverages[0]/2.0)) }, { uint32_t(ceil(coverages[1]/2.0)) }
+        { uint32_t(ceil(coverage_for_correct_allele/2.0)) }, { uint32_t(ceil(coverage_for_incorrect_allele/2.0)) }
     };
 
     sample_info.set_coverage_information(
@@ -23,9 +24,10 @@ SampleInfo GCPSampleInfoModel::produce_data()
 
 
 // NB : trivial method, not tested
-GCPSampleInfoModels::GCPSampleInfoModels(const RNGModels &rng_models, GenotypingOptions const* genotyping_options) {
-    for (uint32_t sample_index = 0; sample_index < rng_models.size(); ++sample_index) {
-        std::shared_ptr<GCPSampleInfoModel> gcp_sample_info_model = std::make_shared<GCPSampleInfoModel>(sample_index, genotyping_options, rng_models[sample_index]);
+GCPSampleInfoModels::GCPSampleInfoModels(const KmerCoverageModels &kmer_coverage_models, GenotypingOptions const* genotyping_options) {
+    for (uint32_t sample_index = 0; sample_index < kmer_coverage_models.size(); ++sample_index) {
+        std::shared_ptr<GCPSampleInfoModel> gcp_sample_info_model =
+            std::make_shared<GCPSampleInfoModel>(sample_index, genotyping_options, kmer_coverage_models[sample_index]);
         push_back(gcp_sample_info_model);
     }
 }
