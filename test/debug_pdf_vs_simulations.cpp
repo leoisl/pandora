@@ -57,8 +57,8 @@ void print_vector_to_file(const std::vector<double> &pdf, const std::string &fil
 }
 
 void debug_pdf_vs_simulations() {
-//    // double negative_binomial_parameter_r = 2.41921;
-    double negative_binomial_parameter_r = 3;
+//    double negative_binomial_parameter_r = 2.41921; // the value for 063_STEC
+    double negative_binomial_parameter_r = 2; // rounded value
     double negative_binomial_parameter_p = 0.0335631;
 
     std::vector<uint32_t> nb_of_simulations{1000, 10000, 100000, 1000000, 10000000};
@@ -73,3 +73,9 @@ void debug_pdf_vs_simulations() {
         print_vector_to_file(simulated_pdf, filename);
     }
 }
+
+
+// Uncomment this to run debug_pdf_vs_simulations()
+//TEST(debug_pdf_vs_simulations_dummy, debug_pdf_vs_simulations_dummydummy) {
+//    debug_pdf_vs_simulations();
+//}
