@@ -49,9 +49,9 @@ double GCPGenotyperAdapter::get_genotype_confidence() const
 
 // NB : trivial method, not tested
 void GCPWrapper::train() {
-    // simulate 10000 confidences according to our Model and our Genotyper
+    // simulate 10000000 confidences according to our Model and our Genotyper
     GCP::Simulator<SampleInfo, GCPGenotyperAdapter> genotype_confidence_simulator(model.get());
-    std::vector<GCP::GenotypeConfidence> simulated_confidences = genotype_confidence_simulator.simulate(10000);
+    std::vector<GCP::GenotypeConfidence> simulated_confidences = genotype_confidence_simulator.simulate(10000000);
 
     // create the Percentiler
     genotype_confidence_percentiler = std::make_shared<GCP::Percentiler>(simulated_confidences);
