@@ -763,7 +763,7 @@ public:
 
 GenotypingOptions
     SampleInfoTest___get_gaps___Fixture::genotyping_options_with_min_kmer_covg_10(
-        { 10, 10, 10, 10, 10, 10, 10, 10, 10, 10 }, 0.01, 0, 0, 0, 0, 0, 10, false);
+        { 100, 100, 100, 100, 100, 100, 100, 100, 100, 100 }, 0.01, 0, 0, 0, 0, 0, false);
 
 TEST_F(SampleInfoTest___get_gaps___Fixture, get_gaps___coverages_just_below_threshold)
 {
@@ -818,7 +818,7 @@ TEST_F(SampleInfoTest___get_gaps___Fixture,
 TEST(SampleInfoTest,
     get_min_coverage_threshold_for_this_sample___min_allele_covg_is_higher)
 {
-    GenotypingOptions genotyping_options({ 10, 5 }, 0.01, 0, 100, 1.0, 0, 0, 00, false);
+    GenotypingOptions genotyping_options({ 10, 5 }, 0.01, 0, 100, 1.0, 0, 0, false);
     SampleInfo sample_info(0, 2, &genotyping_options);
 
     EXPECT_EQ(100, sample_info.get_min_coverage_threshold_for_this_sample());
@@ -828,7 +828,7 @@ TEST(SampleInfoTest,
     get_min_coverage_threshold_for_this_sample___min_fraction_allele_covg_is_higher)
 {
     GenotypingOptions genotyping_options(
-        { 10, 100 }, 0.01, 0, 40, 0.5, 0, 0, 00, false);
+        { 10, 100 }, 0.01, 0, 40, 0.5, 0, 0, false);
     SampleInfo sample_info(1, 2, &genotyping_options);
 
     EXPECT_EQ(50, sample_info.get_min_coverage_threshold_for_this_sample());
@@ -949,7 +949,7 @@ public:
 
 GenotypingOptions
     SampleInfoTest___get_confidence___Fixture::genotyping_options_get_confidence(
-        { 10, 10 }, 0.01, 0, 0, 0.0, 50, 100, 0, 0);
+        { 10, 10 }, 0.01, 0, 0, 0.0, 50, 100, false);
 
 TEST_F(
     SampleInfoTest___get_confidence___Fixture, get_confidence___not_enough_total_covg)
@@ -1078,7 +1078,7 @@ public:
 
 GenotypingOptions SampleInfoTest___get_genotype_from_coverage___Fixture::
     genotyping_options_high_confidence_threshold(
-        { 10, 10 }, 0.01, 100, 0, 0.0, 0, 0, 0, 0);
+        { 10, 10 }, 0.01, 100, 0, 0.0, 0, 0, false);
 
 TEST_F(SampleInfoTest___get_genotype_from_coverage___Fixture, invalid_confidence)
 {
@@ -1601,7 +1601,7 @@ TEST_F(SampleInfoTest___Fixture,
 TEST(SampleInfoTest,
     get_likelihoods_for_all_alleles___gets_correct_likelihood_with_min_covg_threshold)
 {
-    GenotypingOptions genotyping_options({ 1 }, 0.01, 0, 3, 0, 0, 0, 0, false);
+    GenotypingOptions genotyping_options({ 1 }, 0.01, 0, 3, 0, 0, 0, false);
     SampleInfo sample_info(0, 2, &genotyping_options);
     sample_info.set_coverage_information({ { 1 }, { 2 } }, { { 1 }, { 2 } });
 
@@ -1792,7 +1792,7 @@ TEST_F(SampleInfoTest___get_confidence___Fixture,
 TEST_F(SampleInfoTest___get_confidence___Fixture,
     get_confidence___gets_correct_confidence_min_total___confidence_is_invalid)
 {
-    GenotypingOptions genotyping_options({ 10, 10 }, 0.01, 0, 0, 0.0, 3, 0, 0, 0);
+    GenotypingOptions genotyping_options({ 10, 10 }, 0.01, 0, 0, 0.0, 3, 0, false);
     SampleInfoTest___get_confidence___Fixture::SampleInfoMock sample_info(
         0, 2, &genotyping_options);
     EXPECT_CALL(sample_info, get_likelihoods_for_all_alleles)
@@ -1809,7 +1809,7 @@ TEST_F(SampleInfoTest___get_confidence___Fixture,
 TEST_F(SampleInfoTest___get_confidence___Fixture,
     get_confidence___gets_correct_confidence_min_total___confidence_is_valid)
 {
-    GenotypingOptions genotyping_options({ 10, 10 }, 0.01, 0, 0, 0.0, 2, 0, 0, 0);
+    GenotypingOptions genotyping_options({ 10, 10 }, 0.01, 0, 0, 0.0, 2, 0, false);
     SampleInfoTest___get_confidence___Fixture::SampleInfoMock sample_info(
         0, 2, &genotyping_options);
     EXPECT_CALL(sample_info, get_likelihoods_for_all_alleles)
@@ -1830,7 +1830,7 @@ TEST_F(SampleInfoTest___get_confidence___Fixture,
 TEST_F(SampleInfoTest___get_confidence___Fixture,
     get_confidence___gets_correct_confidence_min_diff)
 {
-    GenotypingOptions genotyping_options({ 10, 10 }, 0.01, 0, 0, 0.0, 0, 3, 0, 0);
+    GenotypingOptions genotyping_options({ 10, 10 }, 0.01, 0, 0, 0.0, 0, 3, false);
     SampleInfoTest___get_confidence___Fixture::SampleInfoMock sample_info(
         0, 2, &genotyping_options);
     EXPECT_CALL(sample_info, get_likelihoods_for_all_alleles)

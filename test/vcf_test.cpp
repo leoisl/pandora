@@ -761,7 +761,7 @@ public:
     static GenotypingOptions genotyping_options_snps_only;
 };
 GenotypingOptions VCFTest___genotype___Fixture::genotyping_options_snps_only(
-    { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, 0.01, 0, 0, 0, 0, 0, 0, true);
+    { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 }, 0.01, 0, 0, 0, 0, 0, true);
 
 TEST_F(VCFTest___genotype___Fixture, no_options_set___expects_death)
 {

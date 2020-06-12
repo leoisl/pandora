@@ -381,7 +381,7 @@ int pandora_compare(int argc, char* argv[])
     // set up the options aggregators
     GenotypingOptions genotyping_options({}, genotyping_error_rate,
         confidence_threshold, min_allele_covg_gt, min_allele_fraction_covg_gt,
-        min_total_covg_gt, min_diff_covg_gt, 0, false);
+        min_total_covg_gt, min_diff_covg_gt, false);
 
     std::cout << now() << "Loading Index and LocalPRGs from file" << std::endl;
     auto index = std::make_shared<Index>();
@@ -437,11 +437,9 @@ int pandora_compare(int argc, char* argv[])
         std::shared_ptr<KmerCoverageModel> kmer_coverage_model;
         std::tie(exp_depth_covg, kmer_coverage_model) = estimate_parameters(
             pangraph_sample, sample_outdir, k, e_rate, covg, bin, 0);
+
         genotyping_options.add_exp_depth_covg(exp_depth_covg);
         kmer_coverage_models.push_back(kmer_coverage_model);
-
-        if (genotyping_options.get_min_kmer_covg() == 0)
-            genotyping_options.set_min_kmer_covg(exp_depth_covg / 10);
 
         BOOST_LOG_TRIVIAL(info) << "Find max likelihood PRG paths";
         auto sample_pangraph_size = pangraph_sample->nodes.size();

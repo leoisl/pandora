@@ -13,14 +13,13 @@ private:
     float min_fraction_allele_covg;
     uint32_t min_site_total_covg;
     uint32_t min_site_diff_covg;
-    uint32_t min_kmer_covg;
     bool snps_only;
 
 public:
     GenotypingOptions(const std::vector<uint32_t>& sampleIndexToExpDepthCovg,
         float errorRate, uint16_t confidenceThreshold, uint32_t minAlleleCovg,
         float minFractionAlleleCovg, uint32_t minSiteTotalCovg,
-        uint32_t minSiteDiffCovg, uint32_t minKmerCovg, bool snpsOnly)
+        uint32_t minSiteDiffCovg, bool snpsOnly)
         : sample_index_to_exp_depth_covg(sampleIndexToExpDepthCovg)
         , error_rate(errorRate)
         , confidence_threshold(confidenceThreshold)
@@ -28,7 +27,6 @@ public:
         , min_fraction_allele_covg(minFractionAlleleCovg)
         , min_site_total_covg(minSiteTotalCovg)
         , min_site_diff_covg(minSiteDiffCovg)
-        , min_kmer_covg(minKmerCovg)
         , snps_only(snpsOnly)
     {
     }
@@ -50,11 +48,8 @@ public:
 
     uint32_t get_min_site_diff_covg() const { return min_site_diff_covg; }
 
-    uint32_t get_min_kmer_covg() const { return min_kmer_covg; }
-
-    void set_min_kmer_covg(uint32_t min_kmer_covg)
-    {
-        this->min_kmer_covg = min_kmer_covg;
+    uint32_t get_min_kmer_covg(uint32_t sample_index) const {
+        return sample_index_to_exp_depth_covg[sample_index] / 10;
     }
 
     bool is_snps_only() const { return snps_only; }

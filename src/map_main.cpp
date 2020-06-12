@@ -400,7 +400,7 @@ int pandora_map(int argc, char* argv[])
 
     GenotypingOptions genotyping_options({}, genotyping_error_rate,
         confidence_threshold, min_allele_covg_gt, min_allele_fraction_covg_gt,
-        min_total_covg_gt, min_diff_covg_gt, 0, false);
+        min_total_covg_gt, min_diff_covg_gt, false);
 
     fs::create_directories(outdir);
     if (output_kg)
@@ -444,8 +444,6 @@ int pandora_map(int argc, char* argv[])
     kmer_coverage_models.push_back(kmer_coverage_model);
 
     genotyping_options.add_exp_depth_covg(exp_depth_covg);
-    if (genotyping_options.get_min_kmer_covg() == 0)
-        genotyping_options.set_min_kmer_covg(exp_depth_covg / 10);
 
     std::cout << now() << "Find PRG paths and write to files:" << std::endl;
 
