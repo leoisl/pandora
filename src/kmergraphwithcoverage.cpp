@@ -25,7 +25,7 @@ void KmerGraphWithCoverage::set_exp_depth_covg(const uint32_t edp)
     exp_depth_covg = edp;
 }
 
-void KmerGraphWithCoverage::set_binomial_parameter_p(const float e_rate)
+void KmerGraphWithCoverage::set_binomial_parameter_p(const double e_rate)
 {
     BOOST_LOG_TRIVIAL(debug) << "Set p in kmergraph";
     assert(kmer_prg->k != 0);
@@ -78,7 +78,7 @@ void KmerGraphWithCoverage::set_covg(
 }
 
 void KmerGraphWithCoverage::set_negative_binomial_parameters(
-    const float& nbin_prob, const float& nb_fail)
+    const double& nbin_prob, const double& nb_fail)
 {
     if (nbin_prob == 0 and nb_fail == 0)
         return;
@@ -95,31 +95,31 @@ void KmerGraphWithCoverage::set_negative_binomial_parameters(
     BOOST_LOG_TRIVIAL(debug) << "For KmerGraph " << kmer_prg << ", negative_binomial_parameter_r set to " << negative_binomial_parameter_r;
 }
 
-float KmerGraphWithCoverage::nbin_prob(uint32_t node_id, const uint32_t& sample_id)
+double KmerGraphWithCoverage::nbin_prob(uint32_t node_id, const uint32_t& sample_id)
 {
     auto k = get_covg(node_id, 0, sample_id) + get_covg(node_id, 1, sample_id);
-    float return_prob
+    double return_prob
         = log(pdf(boost::math::negative_binomial(
                       negative_binomial_parameter_r, negative_binomial_parameter_p),
             k));
-    return_prob = std::max(return_prob, std::numeric_limits<float>::lowest() / 1000);
+    return_prob = std::max(return_prob, std::numeric_limits<double>::lowest() / 1000);
     return return_prob;
 }
 
-float KmerGraphWithCoverage::lin_prob(uint32_t node_id, const uint32_t& sample_id)
+double KmerGraphWithCoverage::lin_prob(uint32_t node_id, const uint32_t& sample_id)
 {
     assert(num_reads != 0);
     auto k = get_covg(node_id, 0, sample_id) + get_covg(node_id, 1, sample_id);
-    return log(float(k) / num_reads);
+    return log(double(k) / num_reads);
 }
 
-float KmerGraphWithCoverage::bin_prob(uint32_t node_id, const uint32_t& sample_id)
+double KmerGraphWithCoverage::bin_prob(uint32_t node_id, const uint32_t& sample_id)
 {
     assert(num_reads != 0);
     return bin_prob(node_id, num_reads, sample_id);
 }
 
-float KmerGraphWithCoverage::bin_prob(
+double KmerGraphWithCoverage::bin_prob(
     const uint32_t& node_id, const uint32_t& num, const uint32_t& sample_id)
 {
     assert(binomial_parameter_p != 1);
@@ -133,7 +133,7 @@ float KmerGraphWithCoverage::bin_prob(
     uint32_t sum_coverages
         = get_covg(node_id, 0, sample_id) + get_covg(node_id, 1, sample_id);
 
-    float return_prob;
+    double return_prob;
     if (node_id == (*(kmer_prg->sorted_nodes.begin()))->id
         or node_id == (*(kmer_prg->sorted_nodes.rbegin()))->id) {
         return_prob = 0; // is really undefined
@@ -152,7 +152,7 @@ float KmerGraphWithCoverage::bin_prob(
     return return_prob;
 }
 
-float KmerGraphWithCoverage::get_prob(
+double KmerGraphWithCoverage::get_prob(
     const std::string& prob_model, const uint32_t& node_id, const uint32_t& sample_id)
 {
     if (prob_model == "nbin") {
@@ -188,7 +188,7 @@ bool KmerGraphWithCoverage::coverage_is_zeroes(const uint32_t& sample_id)
     return all_zero;
 }
 
-float KmerGraphWithCoverage::find_max_path(std::vector<KmerNodePtr>& maxpath,
+double KmerGraphWithCoverage::find_max_path(std::vector<KmerNodePtr>& maxpath,
     const std::string& prob_model, const uint32_t& max_num_kmers_to_average,
     const uint32_t& sample_id)
 {
@@ -200,19 +200,19 @@ float KmerGraphWithCoverage::find_max_path(std::vector<KmerNodePtr>& maxpath,
     // also check not all 0 covgs
     auto coverages_all_zero = coverage_is_zeroes(sample_id);
     if (coverages_all_zero)
-        return std::numeric_limits<float>::lowest();
+        return std::numeric_limits<double>::lowest();
 
     // create vectors to hold the intermediate values
-    std::vector<float> max_sum_of_log_probs_from_node(sorted_nodes.size(), 0);
+    std::vector<double> max_sum_of_log_probs_from_node(sorted_nodes.size(), 0);
     std::vector<uint32_t> length_of_maxpath_from_node(sorted_nodes.size(), 0);
     std::vector<uint32_t> prev_node_along_maxpath(
         sorted_nodes.size(), sorted_nodes.size() - 1);
-    float max_mean;
+    double max_mean;
     int max_length;
-    const float tolerance = 0.000001;
+    const double tolerance = 0.000001;
 
     for (uint32_t j = sorted_nodes.size() - 1; j != 0; --j) {
-        max_mean = std::numeric_limits<float>::lowest();
+        max_mean = std::numeric_limits<double>::lowest();
         max_length = 0; // tie break with longest kmer path
         const auto& current_node = sorted_nodes[j - 1];
         for (uint32_t i = 0; i != current_node->out_nodes.size(); ++i) {
@@ -356,10 +356,10 @@ std::vector<std::vector<KmerNodePtr>> KmerGraphWithCoverage::get_random_paths(
     return rpaths;
 }
 
-float KmerGraphWithCoverage::prob_path(const std::vector<KmerNodePtr>& kpath,
+double KmerGraphWithCoverage::prob_path(const std::vector<KmerNodePtr>& kpath,
     const uint32_t& sample_id, const std::string& prob_model)
 {
-    float return_prob_path = 0;
+    double return_prob_path = 0;
     for (uint32_t i = 0; i != kpath.size(); ++i) {
         return_prob_path += get_prob(prob_model, kpath[i]->id, sample_id);
     }
@@ -377,7 +377,7 @@ float KmerGraphWithCoverage::prob_path(const std::vector<KmerNodePtr>& kpath,
 }
 
 /*
-float KmerGraph::prob_paths(const std::vector<std::vector<KmerNodePtr>> &kpaths) {
+double KmerGraph::prob_paths(const std::vector<std::vector<KmerNodePtr>> &kpaths) {
     if (kpaths.empty()) {
         return 0; // is this the correct default?
     }
@@ -391,7 +391,7 @@ float KmerGraph::prob_paths(const std::vector<std::vector<KmerNodePtr>> &kpaths)
     }
 
     // now calculate max likelihood assuming independent paths
-    float ret_p = 0;
+    double ret_p = 0;
     uint32_t len = 0;
     for (uint32_t i = 0; i != path_node_covg.size(); ++i) {
         if (path_node_covg[i] > 0) {

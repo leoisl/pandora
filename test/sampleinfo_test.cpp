@@ -1534,7 +1534,7 @@ TEST_F(SampleInfoTest___solve_incompatible_gt_conflict_with___Fixture,
 //    sample_info["nothing"] = {0};
 //    vr.sampleIndex_to_sampleInfo.push_back(sample_info);
 //    assert(vr.sampleIndex_to_sampleInfo.size() > 0);
-//    std::vector<float> f = {0.0, 0.0};
+//    std::vector<double> f = {0.0, 0.0};
 //    vr.set_format(0,"GAPS", f);
 //    vr.likelihood({1}, 0.01, 0);
 //    bool found_likelihood = !vr.get_format_f(0, "LIKELIHOOD").empty();
@@ -1576,7 +1576,7 @@ TEST_F(SampleInfoTest___solve_incompatible_gt_conflict_with___Fixture,
 //    vr.sampleIndex_to_sampleInfo.emplace_back_several_empty_sample_infos(1);
 //    vr.sampleIndex_to_sampleInfo[0]["MEAN_FWD_COVG"] = {1, 2};
 //    vr.sampleIndex_to_sampleInfo[0]["MEAN_REV_COVG"] = {1, 2};
-//    std::vector<float> f = {0.0, 0.0};
+//    std::vector<double> f = {0.0, 0.0};
 //    vr.set_format(0,"GAPS", f);
 //    vr.likelihood({1}, 0.01, 0);
 //    bool found_likelihood = !vr.get_format_f(0, "LIKELIHOOD").empty();
@@ -1594,7 +1594,7 @@ TEST_F(SampleInfoTest___Fixture,
 
     actual = default_sample_info.get_likelihoods_for_all_alleles()[1];
     expected
-        = -1 - log(4) - log(3) - log(2) + 2 * log(0.01) + log(1 - exp(-(float(1))));
+        = -1 - log(4) - log(3) - log(2) + 2 * log(0.01) + log(1 - exp(-(double(1))));
     EXPECT_NEAR(actual, expected, 0.00001);
 }
 
@@ -1606,11 +1606,11 @@ TEST(SampleInfoTest,
     sample_info.set_coverage_information({ { 1 }, { 2 } }, { { 1 }, { 2 } });
 
     double actual = sample_info.get_likelihoods_for_all_alleles()[0];
-    double expected = 4 * log(0.01) - 1 + log(1 - exp(-(float(1))));
+    double expected = 4 * log(0.01) - 1 + log(1 - exp(-(double(1))));
     EXPECT_NEAR(actual, expected, 0.00001);
 
     actual = sample_info.get_likelihoods_for_all_alleles()[1];
-    expected = -1 - log(4) - log(3) - log(2) + log(1 - exp(-(float(1))));
+    expected = -1 - log(4) - log(3) - log(2) + log(1 - exp(-(double(1))));
     EXPECT_NEAR(actual, expected, 0.00001);
 }
 
@@ -1619,11 +1619,11 @@ TEST_F(SampleInfoTest___Fixture, get_likelihoods_for_all_alleles___handles_ref_c
     default_sample_info.set_coverage_information({ { 0 }, { 2 } }, { { 0 }, { 2 } });
 
     double actual = default_sample_info.get_likelihoods_for_all_alleles()[0];
-    double expected = -1 + 4 * log(0.01) + log(1 - exp(-(float(1))));
+    double expected = -1 + 4 * log(0.01) + log(1 - exp(-(double(1))));
     EXPECT_NEAR(actual, expected, 0.00001);
 
     actual = default_sample_info.get_likelihoods_for_all_alleles()[1];
-    expected = -1 - log(4) - log(3) - log(2) + log(1 - exp(-(float(1))));
+    expected = -1 - log(4) - log(3) - log(2) + log(1 - exp(-(double(1))));
     EXPECT_NEAR(actual, expected, 0.00001);
 }
 
@@ -1632,11 +1632,11 @@ TEST_F(SampleInfoTest___Fixture, get_likelihoods_for_all_alleles___handles_alt_c
     default_sample_info.set_coverage_information({ { 1 }, { 0 } }, { { 1 }, { 0 } });
 
     double actual = default_sample_info.get_likelihoods_for_all_alleles()[0];
-    double expected = -1 - log(2) + log(1 - exp(-(float(1))));
+    double expected = -1 - log(2) + log(1 - exp(-(double(1))));
     EXPECT_NEAR(actual, expected, 0.00001);
 
     actual = default_sample_info.get_likelihoods_for_all_alleles()[1];
-    expected = -1 + 2 * log(0.01) + log(1 - exp(-(float(1))));
+    expected = -1 + 2 * log(0.01) + log(1 - exp(-(double(1))));
     EXPECT_NEAR(actual, expected, 0.00001);
 }
 
@@ -1671,12 +1671,12 @@ TEST_F(SampleInfoTest___gets_correct_likelihood_gaps___Fixture,
 
     double actual = sample_info.get_likelihoods_for_all_alleles()[0];
     double expected
-        = -1 - log(2) + 4 * log(0.01) + 0.5 * log(1 - exp(-(float(1)))) - 0.5;
+        = -1 - log(2) + 4 * log(0.01) + 0.5 * log(1 - exp(-(double(1)))) - 0.5;
     EXPECT_NEAR(actual, expected, 0.00001);
 
     actual = sample_info.get_likelihoods_for_all_alleles()[1];
     expected = -1 - log(4) - log(3) - log(2) + 2 * log(0.01)
-        + 0.2 * log(1 - exp(-(float(1)))) - 0.8;
+        + 0.2 * log(1 - exp(-(double(1)))) - 0.8;
     EXPECT_NEAR(actual, expected, 0.00001);
 }
 
@@ -1692,7 +1692,7 @@ TEST_F(SampleInfoTest___gets_correct_likelihood_gaps___Fixture,
 //    vr.sampleIndex_to_sampleInfo[0]["MEAN_REV_COVG"] = {1, 2};
 //    vr.sampleIndex_to_sampleInfo[1]["MEAN_FWD_COVG"] = {1, 2};
 //    vr.sampleIndex_to_sampleInfo[1]["MEAN_REV_COVG"] = {1, 2};
-//    std::vector<float> f = {0.5, 0.8};
+//    std::vector<double> f = {0.5, 0.8};
 //    vr.set_format(0,"GAPS", f);
 //    vr.set_format(1,"GAPS", f);
 //    EXPECT_DEATH(vr.likelihood({1}, 0.01, 0), "");
@@ -1707,21 +1707,21 @@ TEST_F(SampleInfoTest___gets_correct_likelihood_gaps___Fixture,
 //    vr.sampleIndex_to_sampleInfo[0]["MEAN_REV_COVG"] = {1, 2};
 //    vr.sampleIndex_to_sampleInfo[1]["MEAN_FWD_COVG"] = {1, 2};
 //    vr.sampleIndex_to_sampleInfo[1]["MEAN_REV_COVG"] = {1, 2};
-//    std::vector<float> f = {0.5, 0.8};
+//    std::vector<double> f = {0.5, 0.8};
 //    vr.set_format(0,"GAPS", f);
 //    vr.set_format(1,"GAPS", f);
 //    vr.likelihood({1,2}, 0.01, 0);
 //
-//    float exp_likelihood = -1 - log(2) + 4 * log(0.01) + 0.5*log(1-exp(-(float(1)))) -
-//    0.5; EXPECT_FLOAT_EQ(exp_likelihood,
+//    double exp_likelihood = -1 - log(2) + 4 * log(0.01) + 0.5*log(1-exp(-(double(1)))) -
+//    0.5; EXPECT_DOUBLE_EQ(exp_likelihood,
 //    vr.sampleIndex_to_sampleInfo[0]["LIKELIHOOD"][0]); exp_likelihood = -1 - log(4) -
-//    log(3) - log(2) + 2 * log(0.01) + 0.2*log(1-exp(-(float(1)))) - 0.8;
-//    EXPECT_FLOAT_EQ(exp_likelihood, vr.sampleIndex_to_sampleInfo[0]["LIKELIHOOD"][1]);
+//    log(3) - log(2) + 2 * log(0.01) + 0.2*log(1-exp(-(double(1)))) - 0.8;
+//    EXPECT_DOUBLE_EQ(exp_likelihood, vr.sampleIndex_to_sampleInfo[0]["LIKELIHOOD"][1]);
 //    exp_likelihood = 2*log(2) -2 - log(2) + 4 * log(0.01) +
-//    0.5*log(1-exp(-(float(2)))) - 2*0.5; EXPECT_FLOAT_EQ(exp_likelihood,
+//    0.5*log(1-exp(-(double(2)))) - 2*0.5; EXPECT_DOUBLE_EQ(exp_likelihood,
 //    vr.sampleIndex_to_sampleInfo[1]["LIKELIHOOD"][0]); exp_likelihood = 4*log(2) -2 -
-//    log(4) - log(3) - log(2) + 2 * log(0.01) + 0.2*log(1-exp(-(float(2)))) - 2*0.8;
-//    EXPECT_FLOAT_EQ(exp_likelihood, vr.sampleIndex_to_sampleInfo[1]["LIKELIHOOD"][1]);
+//    log(4) - log(3) - log(2) + 2 * log(0.01) + 0.2*log(1-exp(-(double(2)))) - 2*0.8;
+//    EXPECT_DOUBLE_EQ(exp_likelihood, vr.sampleIndex_to_sampleInfo[1]["LIKELIHOOD"][1]);
 //}
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1736,7 +1736,7 @@ TEST_F(SampleInfoTest___gets_correct_likelihood_gaps___Fixture,
 //    vr.confidence();
 //    bool found_confidence = !vr.get_format_f(0,"GT_CONF").empty();
 //    EXPECT_FALSE(found_confidence);
-//    std::vector<float> f = {-1.0};
+//    std::vector<double> f = {-1.0};
 //    vr.set_format(0,"LIKELIHOOD", f);
 //    EXPECT_DEATH(vr.confidence(), "");
 //}

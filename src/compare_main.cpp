@@ -121,7 +121,7 @@ int pandora_compare(int argc, char* argv[])
              threads = 1; // default parameters
     uint16_t confidence_threshold = 1;
     int max_diff = 250;
-    float e_rate = 0.11, min_allele_fraction_covg_gt = 0, genotyping_error_rate = 0.01;
+    double e_rate = 0.11, min_allele_fraction_covg_gt = 0, genotyping_error_rate = 0.01;
     bool illumina = false, clean = false, bin = false;
     std::string genotype;
     for (int i = 1; i < argc; ++i) {

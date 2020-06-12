@@ -172,7 +172,7 @@ std::pair<DenovoPaths, FoundPaths> LocalAssemblyGraph::get_paths_between(
     do {
         paths_between_queries.clear();
 
-        const float required_percent_of_expected_covg { retries * COVG_SCALING_FACTOR };
+        const double required_percent_of_expected_covg { retries * COVG_SCALING_FACTOR };
         if (required_percent_of_expected_covg > 1.0) {
             BOOST_LOG_TRIVIAL(debug)
                 << "Abandoning local assembly for slice as too many paths.";
@@ -195,7 +195,7 @@ void LocalAssemblyGraph::build_paths_between(const std::string& start_kmer,
     const std::string& end_kmer, std::string path_accumulator, DfsTree& tree,
     BfsDistanceMap& node_to_distance_to_the_end_node,
     DenovoPaths& paths_between_queries, const uint32_t& max_path_length,
-    const double& expected_kmer_covg, const float& required_percent_of_expected_covg,
+    const double& expected_kmer_covg, const double& required_percent_of_expected_covg,
     uint32_t num_kmers_below_threshold)
 {
     if (path_accumulator.length() > max_path_length

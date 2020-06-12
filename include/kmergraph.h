@@ -68,7 +68,7 @@ public:
 
     friend std::ostream& operator<<(std::ostream& out, KmerGraph const& data);
 
-    friend std::pair<ExpDepthCovg, std::shared_ptr<RNGModel>> estimate_parameters(std::shared_ptr<pangenome::Graph>, const std::string&, const uint32_t, float&, const uint32_t, bool& bin, const uint32_t& sample_id);
+    friend std::pair<ExpDepthCovg, std::shared_ptr<RNGModel>> estimate_parameters(std::shared_ptr<pangenome::Graph>, const std::string&, const uint32_t, double&, const uint32_t, bool& bin, const uint32_t& sample_id);
 
     // friends
     friend struct condition;

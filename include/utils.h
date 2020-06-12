@@ -53,7 +53,7 @@ char complement(char);
 
 std::string rev_complement(std::string);
 
-float lognchoosek2(uint32_t, uint32_t, uint32_t);
+double lognchoosek2(uint32_t, uint32_t, uint32_t);
 
 // probably should be moved to map_main.cpp
 void read_prg_file(
@@ -68,7 +68,7 @@ void add_read_hits(const Seq&, const std::shared_ptr<MinimizerHits>&, const Inde
 
 void define_clusters(std::set<std::set<MinimizerHitPtr, pComp>, clusterComp>&,
     const std::vector<std::shared_ptr<LocalPRG>>&, std::shared_ptr<MinimizerHits>,
-    const int, const float&, const uint32_t, const uint32_t);
+    const int, const double&, const uint32_t, const uint32_t);
 
 void filter_clusters(std::set<std::set<MinimizerHitPtr, pComp>, clusterComp>&);
 
@@ -77,20 +77,20 @@ void filter_clusters2(
 
 void infer_localPRG_order_for_reads(const std::vector<std::shared_ptr<LocalPRG>>& prgs,
     std::shared_ptr<MinimizerHits> minimizer_hits, std::shared_ptr<pangenome::Graph>,
-    const int, const uint32_t&, const float&, const uint32_t min_cluster_size = 10,
+    const int, const uint32_t&, const double&, const uint32_t min_cluster_size = 10,
     const uint32_t expected_number_kmers_in_short_read_sketch
     = std::numeric_limits<uint32_t>::max());
 
 uint32_t pangraph_from_read_file(const std::string&, std::shared_ptr<pangenome::Graph>,
     std::shared_ptr<Index>, const std::vector<std::shared_ptr<LocalPRG>>&,
-    const uint32_t, const uint32_t, const int, const float&,
+    const uint32_t, const uint32_t, const int, const double&,
     const uint32_t min_cluster_size = 10, const uint32_t genome_size = 5000000,
     const bool illumina = false, const bool clean = false,
     const uint32_t max_covg = 300, uint32_t threads = 1);
 
-//, const uint32_t, const float&, bool);
+//, const uint32_t, const double&, bool);
 void infer_most_likely_prg_path_for_pannode(
-    const std::vector<std::shared_ptr<LocalPRG>>&, PanNode*, uint32_t, float);
+    const std::vector<std::shared_ptr<LocalPRG>>&, PanNode*, uint32_t, double);
 
 void fatal_error(const std::string& message);
 

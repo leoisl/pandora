@@ -995,7 +995,7 @@ void LocalPRG::write_covgs_to_file(
 }
 
 void LocalPRG::write_path_to_fasta(const boost::filesystem::path& filepath,
-    const std::vector<LocalNodePtr>& lmp, const float& ppath) const
+    const std::vector<LocalNodePtr>& lmp, const double& ppath) const
 {
     std::ofstream handle;
     handle.open(filepath.string());
@@ -1011,7 +1011,7 @@ void LocalPRG::write_path_to_fasta(const boost::filesystem::path& filepath,
 }
 
 void LocalPRG::append_path_to_fasta(const boost::filesystem::path& filepath,
-    const std::vector<LocalNodePtr>& lmp, const float& ppath) const
+    const std::vector<LocalNodePtr>& lmp, const double& ppath) const
 {
     std::ofstream handle;
     handle.open(filepath.string(), std::ios::app);
@@ -1027,7 +1027,7 @@ void LocalPRG::append_path_to_fasta(const boost::filesystem::path& filepath,
 }
 
 void LocalPRG::write_aligned_path_to_fasta(const boost::filesystem::path& filepath,
-    const std::vector<LocalNodePtr>& lmp, const float& ppath) const
+    const std::vector<LocalNodePtr>& lmp, const double& ppath) const
 {
     std::ofstream handle;
     handle.open(filepath.string());
@@ -1605,7 +1605,7 @@ void LocalPRG::add_consensus_path_to_fastaq(Fastaq& output_fq, PanNodePtr pnode,
     std::string prob_model = "nbin";
     if (bin)
         prob_model = "bin";
-    float ppath = pnode->kmer_prg_with_coverage.find_max_path(
+    double ppath = pnode->kmer_prg_with_coverage.find_max_path(
         kmp, prob_model, max_num_kmers_to_average, sample_id);
 
     lmp.reserve(100);

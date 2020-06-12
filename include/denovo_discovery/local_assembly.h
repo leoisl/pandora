@@ -24,7 +24,7 @@ using BfsDistanceMap = std::map<std::string, uint32_t>;
 using DenovoPaths = std::vector<std::string>;
 using FoundPaths = bool;
 
-constexpr float COVG_SCALING_FACTOR { 0.1 };
+constexpr double COVG_SCALING_FACTOR { 0.1 };
 constexpr auto MAX_NUMBER_CANDIDATE_PATHS { 25 };
 
 class LocalAssemblyGraph : public Graph {
@@ -48,7 +48,7 @@ private:
         BfsDistanceMap& node_to_distance_to_the_end_node,
         DenovoPaths& paths_between_queries, const uint32_t& max_path_length,
         const double& expected_kmer_covg,
-        const float& required_percent_of_expected_covg = COVG_SCALING_FACTOR,
+        const double& required_percent_of_expected_covg = COVG_SCALING_FACTOR,
         uint32_t num_kmers_below_threshold = 0);
 };
 

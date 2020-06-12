@@ -316,7 +316,7 @@ TEST(KmerGraphWithCoverageTest, set_nb)
     KmerGraph kmergraph;
     KmerGraphWithCoverage kmergraph_with_coverage(&kmergraph);
     kmergraph_with_coverage.set_negative_binomial_parameters(0, 0);
-    EXPECT_FLOAT_EQ(
+    EXPECT_DOUBLE_EQ(
         kmergraph_with_coverage.negative_binomial_parameter_p, 0.015); // unchanged
 }
 
@@ -604,7 +604,7 @@ TEST(KmerGraphWithCoverageTest, findMaxPath2Level_bin)
         kmergraph.nodes[6], kmergraph.nodes[7] };
     EXPECT_ITERABLE_EQ(vector<KmerNodePtr>, exp_order, mp);
 
-    float exp_p = 0;
+    double exp_p = 0;
     for (uint i = 0; i != exp_order.size(); ++i) {
         exp_p += kmergraph_with_coverage.bin_prob(exp_order[i]->id, sample_id);
     }
@@ -652,7 +652,7 @@ TEST(KmerGraphWithCoverageTest, findMaxPath2Level_nbin)
         kmergraph.nodes[6], kmergraph.nodes[7] };
     EXPECT_ITERABLE_EQ(vector<KmerNodePtr>, exp_order, mp);
 
-    float exp_p = 0;
+    double exp_p = 0;
     for (uint i = 0; i != exp_order.size(); ++i) {
         exp_p += kmergraph_with_coverage.nbin_prob(exp_order[i]->id, sample_id);
     }
@@ -701,7 +701,7 @@ TEST(KmerGraphWithCoverageTest, findMaxPath2Level_lin)
         kmergraph.nodes[6], kmergraph.nodes[7] };
     EXPECT_ITERABLE_EQ(vector<KmerNodePtr>, exp_order, mp);
 
-    float exp_p = 0;
+    double exp_p = 0;
     for (uint i = 0; i != exp_order.size(); ++i) {
         exp_p += kmergraph_with_coverage.lin_prob(exp_order[i]->id, sample_id);
     }
@@ -843,7 +843,7 @@ TEST(KmerGraphWithCoverageTest, path_probs) {
 
     // check get right answer
     vector<KmerNodePtr> exp_nodes = {kmergraph.nodes[4], kmergraph.nodes[5],
-kmergraph.nodes[6], kmergraph.nodes[7], kmergraph.nodes[8]}; float exp_p = 0; for (uint
+kmergraph.nodes[6], kmergraph.nodes[7], kmergraph.nodes[8]}; double exp_p = 0; for (uint
 i = 0; i != exp_nodes.size(); ++i) { exp_p += kmergraph.prob(exp_nodes[i]->id, 5);
     }
     exp_p /= 5;

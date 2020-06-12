@@ -47,7 +47,7 @@ double fit_variance_covg(const std::vector<uint32_t>& kmer_covg_dist, double& me
     return acc / total;
 }
 
-void fit_negative_binomial(double& mean, double& variance, float& p, float& r)
+void fit_negative_binomial(double& mean, double& variance, double& p, double& r)
 {
     assert(mean > 0 and variance > 0);
     assert(mean < variance);
@@ -55,7 +55,7 @@ void fit_negative_binomial(double& mean, double& variance, float& p, float& r)
     r = (mean * p / (1 - p) + variance * p * p / (1 - p)) / 2;
 
     // fix the r parameter by rounding to the closest positive integer
-    r = max(std::round(r), 1.0f);
+    r = max(std::round(r), 1.0);
 
     BOOST_LOG_TRIVIAL(debug) << "Negative binomial parameters p: " << p
                              << " and r: " << r;
@@ -199,7 +199,7 @@ int find_prob_thresh(std::vector<uint32_t>& kmer_prob_dist)
 
 std::pair<ExpDepthCovg, std::shared_ptr<KmerCoverageModel>> estimate_parameters(
     const std::shared_ptr<pangenome::Graph> &pangraph,
-    const std::string& outdir, const uint32_t k, float& e_rate, const uint32_t covg,
+    const std::string& outdir, const uint32_t k, double& e_rate, const uint32_t covg,
     bool& bin, const uint32_t sample_id)
 {
     BOOST_LOG_TRIVIAL(debug) << "[Estimate Parameters] Start";
@@ -231,8 +231,8 @@ std::pair<ExpDepthCovg, std::shared_ptr<KmerCoverageModel>> estimate_parameters(
     uint32_t c, mean_covg;
     unsigned long num_reads = 0;
     int thresh;
-    float binomial_parameter_p;
-    float negative_binomial_parameter_p = 0, negative_binomial_parameter_r = 0;
+    double binomial_parameter_p;
+    double negative_binomial_parameter_p = 0, negative_binomial_parameter_r = 0;
 
     // first we estimate error rate
     for (const auto& node : pangraph->nodes) {
@@ -296,7 +296,7 @@ std::pair<ExpDepthCovg, std::shared_ptr<KmerCoverageModel>> estimate_parameters(
 
         auto old_e_rate = e_rate;
         if (mean_covg > 0 and mean_covg < covg) {
-            e_rate = -log((float)mean_covg / covg) / k;
+            e_rate = -log((double)mean_covg / covg) / k;
         }
         BOOST_LOG_TRIVIAL(debug) << "[Estimate Parameters] Fitting binomial: Estimated error rate updated from " << old_e_rate << " to " << e_rate;
 
@@ -336,8 +336,8 @@ std::pair<ExpDepthCovg, std::shared_ptr<KmerCoverageModel>> estimate_parameters(
                 binomial_parameter_p
                     = node.second->kmer_prg_with_coverage.nbin_prob(i, sample_id);
             for (int j = 0; j < 200; ++j) {
-                if ((float)j - 200 <= binomial_parameter_p
-                    and (float) j + 1 - 200 > binomial_parameter_p) {
+                if ((double)j - 200 <= binomial_parameter_p
+                    and (double) j + 1 - 200 > binomial_parameter_p) {
                     kmer_prob_dist[j] += 1;
                     break;
                 }

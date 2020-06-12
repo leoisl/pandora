@@ -29,9 +29,9 @@ private:
     std::vector<std::vector<std::pair<uint16_t, uint16_t>>>
         node_index_to_sample_coverage;
     uint32_t exp_depth_covg;
-    float binomial_parameter_p;
-    float negative_binomial_parameter_p;
-    float negative_binomial_parameter_r;
+    double binomial_parameter_p;
+    double negative_binomial_parameter_p;
+    double negative_binomial_parameter_r;
     int thresh;
     uint32_t total_number_samples;
     uint32_t num_reads;
@@ -80,9 +80,9 @@ public:
     uint32_t get_covg(uint32_t node_id, bool is_forward, uint32_t sample_id) const;
     uint32_t get_num_reads() const { return num_reads; }
     uint32_t get_total_number_samples() const { return total_number_samples; }
-    float get_binomial_parameter_p () const { return binomial_parameter_p; }
-    float get_negative_binomial_parameter_p () const { return negative_binomial_parameter_p; }
-    float get_negative_binomial_parameter_r () const {return negative_binomial_parameter_r; }
+    double get_binomial_parameter_p () const { return binomial_parameter_p; }
+    double get_negative_binomial_parameter_p () const { return negative_binomial_parameter_p; }
+    double get_negative_binomial_parameter_r () const {return negative_binomial_parameter_r; }
 
 
 
@@ -91,8 +91,8 @@ public:
     void set_covg(
         uint32_t node_id, uint16_t value, bool is_forward, uint32_t sample_id);
     void set_exp_depth_covg(const uint32_t);
-    void set_binomial_parameter_p(const float);
-    void set_negative_binomial_parameters(const float&, const float&);
+    void set_binomial_parameter_p(const double);
+    void set_negative_binomial_parameters(const double&, const double&);
     void set_thresh(int thresh) { this->thresh = thresh; }
     void set_num_reads(uint32_t num_reads) { this->num_reads = num_reads; }
 
@@ -106,20 +106,20 @@ public:
         }
     }
 
-    float nbin_prob(uint32_t, const uint32_t& sample_id);
+    double nbin_prob(uint32_t, const uint32_t& sample_id);
 
-    float lin_prob(uint32_t, const uint32_t& sample_id);
+    double lin_prob(uint32_t, const uint32_t& sample_id);
 
-    float bin_prob(uint32_t, const uint32_t& sample_id);
+    double bin_prob(uint32_t, const uint32_t& sample_id);
 
-    float bin_prob(const uint32_t&, const uint32_t&, const uint32_t& sample_id);
+    double bin_prob(const uint32_t&, const uint32_t&, const uint32_t& sample_id);
 
-    float get_prob(const std::string& prob_model, const uint32_t& node_id,
+    double get_prob(const std::string& prob_model, const uint32_t& node_id,
         const uint32_t& sample_id);
 
     bool coverage_is_zeroes(const uint32_t&);
 
-    float find_max_path(std::vector<KmerNodePtr>& maxpath,
+    double find_max_path(std::vector<KmerNodePtr>& maxpath,
         const std::string& prob_model, const uint32_t& max_num_kmers_to_average,
         const uint32_t& sample_id);
 
@@ -130,10 +130,10 @@ public:
 
     std::vector<std::vector<KmerNodePtr>> get_random_paths(uint32_t);
 
-    float prob_path(const std::vector<KmerNodePtr>& kpath, const uint32_t& sample_id,
+    double prob_path(const std::vector<KmerNodePtr>& kpath, const uint32_t& sample_id,
         const std::string& prob_model);
 
-    float prob_paths(const std::vector<std::vector<KmerNodePtr>>&);
+    double prob_paths(const std::vector<std::vector<KmerNodePtr>>&);
 
     void save(const std::string&, const std::shared_ptr<LocalPRG> = nullptr);
     void load(const std::string&);

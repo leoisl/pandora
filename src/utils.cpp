@@ -87,7 +87,7 @@ std::string rev_complement(std::string s)
     return s;
 }
 
-float lognchoosek2(uint32_t n, uint32_t k1, uint32_t k2)
+double lognchoosek2(uint32_t n, uint32_t k1, uint32_t k2)
 {
     assert(n >= k1 + k2
         || assert_msg(
@@ -96,7 +96,7 @@ float lognchoosek2(uint32_t n, uint32_t k1, uint32_t k2)
             "read cannot result in this kmer. If you are getting this message, then "
             "you have evidence of violation of this assumption. Either try using a "
             "bigger k, or come up with a better model"));
-    float total = 0;
+    double total = 0;
 
     for (uint32_t m = n; m != n - k1 - k2; --m) {
         total += log(m);
@@ -207,7 +207,7 @@ void add_read_hits(const Seq& sequence,
 void define_clusters(std::set<MinimizerHitCluster, clusterComp>& clusters_of_hits,
     const std::vector<std::shared_ptr<LocalPRG>>& prgs,
     std::shared_ptr<MinimizerHits> minimizer_hits, const int max_diff,
-    const float& fraction_kmers_required_for_cluster, const uint32_t min_cluster_size,
+    const double& fraction_kmers_required_for_cluster, const uint32_t min_cluster_size,
     const uint32_t expected_number_kmers_in_short_read_sketch)
 {
     BOOST_LOG_TRIVIAL(debug) << "Define clusters of hits from the "
@@ -415,7 +415,7 @@ void add_clusters_to_pangraph(
 void infer_localPRG_order_for_reads(const std::vector<std::shared_ptr<LocalPRG>>& prgs,
     std::shared_ptr<MinimizerHits> minimizer_hits,
     std::shared_ptr<pangenome::Graph> pangraph, const int max_diff,
-    const uint32_t& genome_size, const float& fraction_kmers_required_for_cluster,
+    const uint32_t& genome_size, const double& fraction_kmers_required_for_cluster,
     const uint32_t min_cluster_size,
     const uint32_t expected_number_kmers_in_short_read_sketch)
 {
@@ -444,7 +444,7 @@ void infer_localPRG_order_for_reads(const std::vector<std::shared_ptr<LocalPRG>>
 uint32_t pangraph_from_read_file(const std::string& filepath,
     std::shared_ptr<pangenome::Graph> pangraph, std::shared_ptr<Index> index,
     const std::vector<std::shared_ptr<LocalPRG>>& prgs, const uint32_t w,
-    const uint32_t k, const int max_diff, const float& e_rate,
+    const uint32_t k, const int max_diff, const double& e_rate,
     const uint32_t min_cluster_size, const uint32_t genome_size, const bool illumina,
     const bool clean, const uint32_t max_covg, uint32_t threads)
 {

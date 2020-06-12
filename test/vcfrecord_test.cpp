@@ -790,7 +790,7 @@ TEST_F(VCFRecordTest___can_biallelic_record_be_merged_into_this______Fixture,
 //    VCFRecord vr(&vcf, "chrom1", 3, "A", "T");
 //    uint16_t v = 20;
 //    EXPECT_DEATH(vr.set_format(0, "hello", v), "");
-//    float w = 20.0;
+//    double w = 20.0;
 //    EXPECT_DEATH(vr.set_format(0, "hello", w), "");
 //}
 //
@@ -836,34 +836,34 @@ TEST_F(VCFRecordTest___can_biallelic_record_be_merged_into_this______Fixture,
 //    EXPECT_ITERABLE_EQ(std::vector<std::string>, vr.format, exp_f);
 //}
 //
-// TEST(VCFRecordTest, add_format_new_float)
+// TEST(VCFRecordTest, add_format_new_double)
 //{
 //    VCFRecord vr(&vcf, "chrom1", 3, "A", "T");
 //    unordered_map<string, vector<uint16_t>> m;
 //    vr.samples.push_back(m);
-//    float v = 20.0;
+//    double v = 20.0;
 //    vr.set_format(0, "hello", v);
 //    EXPECT_EQ(vr.regt_samples.size(), 1);
 //    EXPECT_TRUE(vr.regt_samples[0].find("hello") != vr.regt_samples[0].end());
-//    std::vector<float> exp_v = { v };
-//    EXPECT_ITERABLE_EQ(std::vector<float>, vr.regt_samples[0]["hello"], exp_v);
+//    std::vector<double> exp_v = { v };
+//    EXPECT_ITERABLE_EQ(std::vector<double>, vr.regt_samples[0]["hello"], exp_v);
 //    std::vector<std::string> exp_f = { "GT", "hello" };
 //    EXPECT_ITERABLE_EQ(std::vector<std::string>, vr.format, exp_f);
 //}
 //
-// TEST(VCFRecordTest, add_format_old_float_overwritten)
+// TEST(VCFRecordTest, add_format_old_double_overwritten)
 //{
 //    VCFRecord vr(&vcf, "chrom1", 3, "A", "T");
-//    unordered_map<string, vector<float>> m;
+//    unordered_map<string, vector<double>> m;
 //    m["hello"] = {};
 //    m["hello"].push_back(10.0);
 //    vr.regt_samples.push_back(m);
-//    float v = 20.0;
+//    double v = 20.0;
 //    vr.set_format(0, "hello", v);
 //    EXPECT_EQ(vr.regt_samples.size(), 1);
 //    EXPECT_TRUE(vr.regt_samples[0].find("hello") != vr.regt_samples[0].end());
-//    std::vector<float> exp_v = { v };
-//    EXPECT_ITERABLE_EQ(std::vector<float>, vr.regt_samples[0]["hello"], exp_v);
+//    std::vector<double> exp_v = { v };
+//    EXPECT_ITERABLE_EQ(std::vector<double>, vr.regt_samples[0]["hello"], exp_v);
 //    std::vector<std::string> exp_f = { "GT", "hello" };
 //    EXPECT_ITERABLE_EQ(std::vector<std::string>, vr.format, exp_f);
 //}
@@ -885,30 +885,30 @@ TEST_F(VCFRecordTest___can_biallelic_record_be_merged_into_this______Fixture,
 //    EXPECT_ITERABLE_EQ(std::vector<std::string>, vr.format, exp_f);
 //}
 //
-// TEST(VCFRecordTest, append_format_old_float)
+// TEST(VCFRecordTest, append_format_old_double)
 //{
 //    VCFRecord vr(&vcf, "chrom1", 3, "A", "T");
-//    unordered_map<string, vector<float>> m;
+//    unordered_map<string, vector<double>> m;
 //    vr.regt_samples.push_back(m);
-//    float v = 10.0;
+//    double v = 10.0;
 //    vr.set_format(0, "hello", v);
 //    v = 20.0;
 //    vr.append_format(0, "hello", v);
 //    EXPECT_EQ(vr.regt_samples.size(), 1);
 //    EXPECT_TRUE(vr.regt_samples[0].find("hello") != vr.regt_samples[0].end());
-//    std::vector<float> exp_v = { 10.0, 20.0 };
-//    EXPECT_ITERABLE_EQ(std::vector<float>, vr.regt_samples[0]["hello"], exp_v);
+//    std::vector<double> exp_v = { 10.0, 20.0 };
+//    EXPECT_ITERABLE_EQ(std::vector<double>, vr.regt_samples[0]["hello"], exp_v);
 //    std::vector<std::string> exp_f = { "GT", "hello" };
 //    EXPECT_ITERABLE_EQ(std::vector<std::string>, vr.format, exp_f);
 //}
 //
-// TEST(VCFRecordTest, get_format_float)
+// TEST(VCFRecordTest, get_format_double)
 //{
 //    VCFRecord vr(&vcf, "chrom1", 3, "A", "T");
-//    unordered_map<string, vector<float>> m;
+//    unordered_map<string, vector<double>> m;
 //    m.reserve(3);
 //    vr.regt_samples.push_back(m);
-//    float v = 10.0;
+//    double v = 10.0;
 //    vr.set_format(0, "hello", v);
 //
 //    auto res = vr.get_format_f(1, "hello");
@@ -1033,9 +1033,9 @@ TEST_F(VCFRecordTest___can_biallelic_record_be_merged_into_this______Fixture,
 //    SampleInfo<uint16_t> sample_info_int;
 //    sample_info_int["GT"] = {0};
 //    vr.sampleIndex_to_sampleInfo.push_back(sample_info_int);
-//    SampleInfo<float> sample_info_float;
-//    sample_info_float["pringle"] = {0.1};
-//    vr.sampleIndex_to_sampleInfo.push_back(sample_info_float);
+//    SampleInfo<double> sample_info_double;
+//    sample_info_double["pringle"] = {0.1};
+//    vr.sampleIndex_to_sampleInfo.push_back(sample_info_double);
 //    vr.add_formats({"pringle"});
 //    vector<string> v = {"chrom1", "4", ".", "A", "T", ".", ".", "SVTYPE=SNP",
 //    "GT:pringle"}; stringstream out; out << vr; string rr; for (const auto &s : v) {
@@ -1047,7 +1047,7 @@ TEST_F(VCFRecordTest___can_biallelic_record_be_merged_into_this______Fixture,
 //    out >> ru;
 //    EXPECT_EQ(u, ru);
 //    out.ignore(1, ':');
-//    float rf = 0.0, f = 0.1;
+//    double rf = 0.0, f = 0.1;
 //    out >> rf;
 //    EXPECT_EQ(f, rf);
 //}
@@ -1057,9 +1057,9 @@ TEST_F(VCFRecordTest___can_biallelic_record_be_merged_into_this______Fixture,
 //    SampleInfo<uint16_t> sample_info_int;
 //    sample_info_int["GT"] = {0};
 //    vr.sampleIndex_to_sampleInfo.push_back(sample_info_int);
-//    SampleInfo<float> sample_info_float;
-//    sample_info_float["pringle"] = {0.1};
-//    vr.sampleIndex_to_sampleInfo.push_back(sample_info_float);
+//    SampleInfo<double> sample_info_double;
+//    sample_info_double["pringle"] = {0.1};
+//    vr.sampleIndex_to_sampleInfo.push_back(sample_info_double);
 //    vr.add_formats({"pringle"});
 //    vector<string> v = {"chrom1", "1", ".", "A", "T", ".", ".", "SVTYPE=SNP",
 //    "GT:pringle"}; stringstream out; out << vr; string rr; for (const auto &s : v) {
@@ -1071,7 +1071,7 @@ TEST_F(VCFRecordTest___can_biallelic_record_be_merged_into_this______Fixture,
 //    out >> ru;
 //    EXPECT_EQ(u, ru);
 //    out.ignore(1, ':');
-//    float rf = 0.0, f = 0.1;
+//    double rf = 0.0, f = 0.1;
 //    out >> rf;
 //    EXPECT_EQ(f, rf);
 //}

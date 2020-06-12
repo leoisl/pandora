@@ -896,7 +896,7 @@ TEST_F(VCFTest___genotype___Fixture, genotype_snp_records_only___local_genotypin
 //    80, "A", "A");
 //
 //    vcf.sort_records();
-//    std::vector<float> f = {0.0, 0.0};
+//    std::vector<double> f = {0.0, 0.0};
 //
 //    // record 0, not a snp site
 //    vcf.get_records()[0]->sampleIndex_to_sampleInfo[0]["MEAN_FWD_COVG"] = {0, 10};
@@ -1030,7 +1030,7 @@ TEST_F(VCFTest___genotype___Fixture, genotype_snp_records_only___local_genotypin
 //    80, "AC", "AC");
 //
 //    vcf.sort_records();
-//    std::vector<float> f = {0.0, 0.0};
+//    std::vector<double> f = {0.0, 0.0};
 //
 //    // record 0, not a snp site
 //    vcf.get_records()[0]->sampleIndex_to_sampleInfo[0]["MEAN_FWD_COVG"].push_back(0);

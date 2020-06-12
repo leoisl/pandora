@@ -13,7 +13,7 @@ double fit_mean_covg(const std::vector<uint32_t>&, const uint8_t);
 
 double fit_variance_covg(const std::vector<uint32_t>&, double&, const uint8_t);
 
-void fit_negative_binomial(double&, double&, float&, float&);
+void fit_negative_binomial(double&, double&, double&, double&);
 
 uint32_t find_mean_covg(std::vector<uint32_t>&);
 
@@ -25,7 +25,7 @@ int find_prob_thresh(std::vector<uint32_t>&);
  */
 using ExpDepthCovg = uint32_t;
 std::pair<ExpDepthCovg, std::shared_ptr<KmerCoverageModel>> estimate_parameters(const std::shared_ptr<pangenome::Graph> &pangraph,
-                                                                       const std::string& outdir, const uint32_t k, float& e_rate, const uint32_t covg,
+                                                                       const std::string& outdir, const uint32_t k, double& e_rate, const uint32_t covg,
                                                                        bool& bin, const uint32_t sample_id);
 
 #endif

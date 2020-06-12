@@ -77,13 +77,13 @@ public:
         const boost::filesystem::path&, const std::vector<uint32_t>&) const;
 
     void write_path_to_fasta(const boost::filesystem::path&,
-        const std::vector<LocalNodePtr>&, const float&) const;
+        const std::vector<LocalNodePtr>&, const double&) const;
 
     void append_path_to_fasta(const boost::filesystem::path&,
-        const std::vector<LocalNodePtr>&, const float&) const;
+        const std::vector<LocalNodePtr>&, const double&) const;
 
     void write_aligned_path_to_fasta(const boost::filesystem::path&,
-        const std::vector<LocalNodePtr>&, const float&) const;
+        const std::vector<LocalNodePtr>&, const double&) const;
 
     void add_new_records_and_genotype_to_vcf_using_max_likelihood_path_of_the_sample(
         VCF& vcf, const std::vector<LocalNodePtr>& rpath,
@@ -136,8 +136,8 @@ public:
     friend class prg::Path; // for memoization
 };
 
-bool operator<(const std::pair<std::vector<LocalNodePtr>, float>& p1,
-    const std::pair<std::vector<LocalNodePtr>, float>& p2);
+bool operator<(const std::pair<std::vector<LocalNodePtr>, double>& p1,
+    const std::pair<std::vector<LocalNodePtr>, double>& p2);
 
 bool operator!=(
     const std::vector<KmerNodePtr>& lhs, const std::vector<KmerNodePtr>& rhs);

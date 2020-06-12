@@ -100,7 +100,7 @@ int pandora_map(int argc, char* argv[])
     uint16_t confidence_threshold = 1;
     uint_least8_t denovo_kmer_size { 11 };
     int max_diff = 250;
-    float e_rate = 0.11, min_allele_fraction_covg_gt = 0, genotyping_error_rate = 0.01;
+    double e_rate = 0.11, min_allele_fraction_covg_gt = 0, genotyping_error_rate = 0.01;
     bool output_kg = false, output_vcf = false;
     bool output_comparison_paths = false, output_mapped_read_fa = false;
     bool illumina = false, clean = false;

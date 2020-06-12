@@ -7,18 +7,18 @@
 class GenotypingOptions {
 private:
     std::vector<uint32_t> sample_index_to_exp_depth_covg;
-    float error_rate;
+    double error_rate;
     uint16_t confidence_threshold;
     uint32_t min_allele_covg;
-    float min_fraction_allele_covg;
+    double min_fraction_allele_covg;
     uint32_t min_site_total_covg;
     uint32_t min_site_diff_covg;
     bool snps_only;
 
 public:
     GenotypingOptions(const std::vector<uint32_t>& sampleIndexToExpDepthCovg,
-        float errorRate, uint16_t confidenceThreshold, uint32_t minAlleleCovg,
-        float minFractionAlleleCovg, uint32_t minSiteTotalCovg,
+        double errorRate, uint16_t confidenceThreshold, uint32_t minAlleleCovg,
+        double minFractionAlleleCovg, uint32_t minSiteTotalCovg,
         uint32_t minSiteDiffCovg, bool snpsOnly)
         : sample_index_to_exp_depth_covg(sampleIndexToExpDepthCovg)
         , error_rate(errorRate)
@@ -36,7 +36,7 @@ public:
         return sample_index_to_exp_depth_covg;
     }
 
-    float get_error_rate() const { return error_rate; }
+    double get_error_rate() const { return error_rate; }
 
     uint16_t get_confidence_threshold() const { return confidence_threshold; }
 
