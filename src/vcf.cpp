@@ -534,6 +534,8 @@ std::string VCF::header() const
         += "##FORMAT=<ID=LIKELIHOOD,Number=A,Type=Float,Description=\"Likelihood\">\n";
     header += "##FORMAT=<ID=GT_CONF,Number=1,Type=Float,Description=\"Genotype "
               "confidence\">\n";
+    header += "##FORMAT=<ID=GT_CONF_PERCENTILE,Number=1,Type=Float,Description=\"Genotype "
+              "confidence percentile\">\n";
     for (const std::string& chrom : chroms) {
         header += "##contig=<ID=" + chrom + ">\n";
     }

@@ -2180,6 +2180,7 @@ TEST_F(VCFTest___header___Fixture, header)
           "##FORMAT=<ID=LIKELIHOOD,Number=A,Type=Float,Description=\"Likelihood\">\n"
           "##FORMAT=<ID=GT_CONF,Number=1,Type=Float,Description=\"Genotype "
           "confidence\">\n"
+          "##FORMAT=<ID=GT_CONF_PERCENTILE,Number=1,Type=Float,Description=\"Genotype confidence percentile\">\n"
           "##contig=<ID=chrom_A>\n"
           "##contig=<ID=chrom_G>\n"
           "##contig=<ID=chrom_Z>\n"
