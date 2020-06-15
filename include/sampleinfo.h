@@ -11,6 +11,7 @@
 #include "OptionsAggregator.h"
 #include <boost/bind.hpp>
 #include "GCPWrapper.h"
+#include "utils.h"
 
 
 // forward declarations

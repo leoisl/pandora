@@ -615,3 +615,12 @@ std::vector<std::string> get_vector_of_strings_from_file(const std::string& file
 
     return lines;
 }
+
+
+
+std::stringstream get_ss_with_nice_formatting() {
+    std::stringstream ss;
+    ss << std::fixed;
+    ss << std::setprecision(3);
+    return ss;
+}

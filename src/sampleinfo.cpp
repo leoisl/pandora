@@ -227,7 +227,7 @@ SampleInfo::get_confidence() const
 
 std::string SampleInfo::get_confidence_to_string() const
 {
-    std::stringstream ss;
+    std::stringstream ss = get_ss_with_nice_formatting();
     auto index_and_confidence_and_max_likelihood_optional = get_confidence();
 
     if (index_and_confidence_and_max_likelihood_optional) {
@@ -245,7 +245,7 @@ std::string SampleInfo::get_confidence_percentile_to_string(const GCPWrapper* co
         return ".";
     }
 
-    std::stringstream ss;
+    std::stringstream ss = get_ss_with_nice_formatting();
     auto index_and_confidence_and_max_likelihood_optional = get_confidence();
 
     if (index_and_confidence_and_max_likelihood_optional) {
@@ -291,7 +291,7 @@ std::string SampleInfo::to_string(bool genotyping_from_maximum_likelihood,
 
     std::vector<double> likelihoods_for_all_alleles = get_likelihoods_for_all_alleles();
 
-    std::stringstream out;
+    std::stringstream out = get_ss_with_nice_formatting();
     if (genotyping_from_maximum_likelihood) {
         out << gt_from_max_likelihood_path_to_string();
     }

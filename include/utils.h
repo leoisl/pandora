@@ -100,4 +100,6 @@ void open_file_for_writing(const std::string& file_path, std::ofstream& stream);
 
 std::vector<std::string> get_vector_of_strings_from_file(const std::string& file_path);
 
+std::stringstream get_ss_with_nice_formatting();
+
 #endif

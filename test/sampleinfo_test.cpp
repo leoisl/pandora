@@ -1050,7 +1050,7 @@ TEST_F(SampleInfoTest___get_confidence_to_string___Fixture, valid_confidence)
         .Times(1)
         .WillOnce(Return(std::make_tuple((size_t)1, 50.5, -200.2)));
 
-    EXPECT_EQ("50.5", sample_info.get_confidence_to_string());
+    EXPECT_EQ("50.500", sample_info.get_confidence_to_string());
 }
 
 class SampleInfoTest___get_genotype_from_coverage___Fixture : public ::testing::Test {
@@ -1134,7 +1134,7 @@ TEST_F(SampleInfoTest___Fixture, to_string___genotyping_from_maximum_likelihood)
     std::string actual = default_sample_info_three_alleles.to_string(true, false);
 
     std::string expected
-        = "1:10,25,53:70,85,116:10,25,50:70,85,120:10,50,160:70,170,350:0,0,0";
+        = "1:10,25,53:70,85,116:10,25,50:70,85,120:10,50,160:70,170,350:0.000,0.000,0.000";
     EXPECT_EQ(actual, expected);
 }
 
@@ -1144,12 +1144,12 @@ TEST_F(SampleInfoTest___Fixture, to_string___genotyping_from_compatible_coverage
     default_sample_info_three_alleles.set_coverage_information(
         { { 10 }, { 20, 30 }, { 40, 50, 70 } },
         { { 70 }, { 80, 90 }, { 100, 120, 130 } });
-    EXPECT_CALL(default_sample_info_three_alleles, get_confidence_percentile_to_string).Times(1).WillOnce(Return("50.5"));
+    EXPECT_CALL(default_sample_info_three_alleles, get_confidence_percentile_to_string).Times(1).WillOnce(Return("50.500"));
 
     std::string actual = default_sample_info_three_alleles.to_string(false, true);
 
     std::string expected = "2:10,25,53:70,85,116:10,25,50:70,85,120:10,50,160:70,170,"
-                           "350:0,0,0:-1559.97,-1558.47,-1577.88:1.50545:50.5";
+                           "350:0.000,0.000,0.000:-1559.974,-1558.469,-1577.878:1.505:50.500";
     EXPECT_EQ(actual, expected);
 }
 
@@ -1948,7 +1948,7 @@ TEST_F(SampleInfoTest___get_confidence_percentile_to_string___Fixture, valid_con
     EXPECT_CALL(gcp_wrapper, get_confidence_percentile).Times(1).WillOnce(Return(20.5));
     auto actual = sample_info.get_confidence_percentile_to_string(&gcp_wrapper);
 
-    EXPECT_EQ("20.5", actual);
+    EXPECT_EQ("20.500", actual);
 }
 
 
