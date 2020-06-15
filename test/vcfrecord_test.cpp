@@ -345,7 +345,7 @@ TEST(VCFRecordTest, get_format___genotyping_from_coverage)
     std::string actual = vcf_record.get_format(false, true);
 
     std::string expected = "GT:MEAN_FWD_COVG:MEAN_REV_COVG:MED_FWD_COVG:MED_REV_COVG:"
-                           "SUM_FWD_COVG:SUM_REV_COVG:GAPS:LIKELIHOOD:GT_CONF";
+                           "SUM_FWD_COVG:SUM_REV_COVG:GAPS:LIKELIHOOD:GT_CONF:GT_CONF_PERCENTILE";
     EXPECT_EQ(actual, expected);
 }
 

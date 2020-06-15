@@ -80,7 +80,7 @@ std::string VCFRecord::get_format(
               "SUM_FWD_COVG", "SUM_REV_COVG", "GAPS" };
     static std::vector<std::string> format_for_genotyping_from_coverage
         = { "GT", "MEAN_FWD_COVG", "MEAN_REV_COVG", "MED_FWD_COVG", "MED_REV_COVG",
-              "SUM_FWD_COVG", "SUM_REV_COVG", "GAPS", "LIKELIHOOD", "GT_CONF" };
+              "SUM_FWD_COVG", "SUM_REV_COVG", "GAPS", "LIKELIHOOD", "GT_CONF", "GT_CONF_PERCENTILE" };
 
     const std::vector<std::string>* format;
     if (genotyping_from_maximum_likelihood)
