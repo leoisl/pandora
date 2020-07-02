@@ -96,41 +96,14 @@ TEST(EstimateParameters_FitNegativeBinomial, SimpleFit)
     EXPECT_DOUBLE_EQ(r, 1);
 }
 
-TEST(EstimateParameters_FitNegativeBinomial, Fit_r_between_0_and_1_rounded_to_1)
-{
-    double mean = 1, variance = 4;
-    double p, r;
-    fit_negative_binomial(mean, variance, p, r);
-    EXPECT_DOUBLE_EQ(p, 0.25);
-
-    // r == (double)1 / 3, but rounded we get 1.0
-    EXPECT_DOUBLE_EQ(r, 1.0);
-}
-
-
-TEST(EstimateParameters_FitNegativeBinomial, Fit_r_rounded_down)
+TEST(EstimateParameters_FitNegativeBinomial, complex_case)
 {
     double mean = 69.6602, variance = 2075.5;
     double p, r;
     fit_negative_binomial(mean, variance, p, r);
     EXPECT_DOUBLE_EQ(p, 0.033563093230546855);
-
-    // r == 2.41921, but rounded we get 2.0
-    EXPECT_DOUBLE_EQ(r, 2.0);
+    EXPECT_NEAR(r, 2.41921, 0.00001);
 }
-
-
-TEST(EstimateParameters_FitNegativeBinomial, Fit_r_rounded_up)
-{
-    double mean = 74.0435, variance = 1217.33;
-    double p, r;
-    fit_negative_binomial(mean, variance, p, r);
-    EXPECT_DOUBLE_EQ(p, 0.060824509377079346);
-
-    // r == 4.79535, but rounded we get 5.0
-    EXPECT_DOUBLE_EQ(r, 5.0);
-}
-
 
 TEST(EstimateParameters_FindMeanCovg, Examples)
 {

@@ -1,6 +1,5 @@
 #include <vector>
 #include <iostream>
-#include <fstream>
 #include <cmath>
 #include <cassert>
 #include <numeric>
@@ -53,10 +52,6 @@ void fit_negative_binomial(double& mean, double& variance, double& p, double& r)
     assert(mean < variance);
     p = mean / variance;
     r = (mean * p / (1 - p) + variance * p * p / (1 - p)) / 2;
-
-    // fix the r parameter by rounding to the closest positive integer
-    r = max(std::round(r), 1.0);
-
     BOOST_LOG_TRIVIAL(debug) << "Negative binomial parameters p: " << p
                              << " and r: " << r;
 }

@@ -31,12 +31,12 @@ protected:
  */
 class NegativeBinomialModel : public RNGModel {
 public:
-    // TODO: while boost::math::negative_binomial accepts a continuous negative_binomial_parameter_r value,
-    // TODO: boost::random::negative_binomial_distribution do not. Thus, here negative_binomial_parameter_r is
-    // TODO: implicitly truncated from double to int, and we have differences on the distribution due to this
+    // NB: while boost::math::negative_binomial accepts a continuous negative_binomial_parameter_r value,
+    // NB: boost::random::negative_binomial_distribution do not. Thus, here negative_binomial_parameter_r is
+    // NB: rounded to the closest int, and we have differences on the distribution due to this
     NegativeBinomialModel(double negative_binomial_parameter_r, double negative_binomial_parameter_p) :
         RNGModel(),
-        nb_distribution(negative_binomial_parameter_r, negative_binomial_parameter_p) {}
+        nb_distribution(std::max(std::round(negative_binomial_parameter_r) , 1.0), negative_binomial_parameter_p) {}
 
     virtual uint32_t get_random_value() {
         return uint32_t(std::max(nb_distribution(random_number_generator), 0));
